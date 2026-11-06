@@ -671,7 +671,9 @@ private:
             std::set<uint64_t> targets;
             auto& m = out.modules[i];
             for (const auto& r : dynamic[i].relas) {
-                const auto type = uint32_t(r.info); const auto symbol = r.info >> 32;
+                const auto type = uint32_t(r.info);
+                // R_RELATIVE ignores its symbol index (AMD64 ABI); SCE libc.prx sets one.
+                const auto symbol = type == 8 ? uint64_t{0} : r.info >> 32;
                 // AMD64 R_X86_64_NONE has no effect: neither the target nor the
                 // symbol/addend is used, and it cannot overlap a real write.
                 if (type == 0) { ++report.ignoredRelocations; continue; }
@@ -680,7 +682,7 @@ private:
                         "unsupported x86-64 relocation " + std::to_string(type));
                 const bool tlsRelocation = type >= 16;
                 // TLS relocations may use symbol 0 (local-dynamic: this module, offset = A).
-                require(symbol < resolved[i].size() && (type != 8 || symbol == 0) && (type == 8 || tlsRelocation || symbol != 0),
+                require(symbol < resolved[i].size() && (type == 8 || tlsRelocation || symbol != 0),
                         "invalid relocation symbol");
                 // An undefined local STT_SECTION symbol in a TLS relocation names this
                 // module's TLS block (local-dynamic model), like symbol 0.
