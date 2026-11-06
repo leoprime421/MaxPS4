@@ -199,6 +199,11 @@ final class MaxPS4GameSource: @unchecked Sendable {
         let bytes = text.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
         return String(decoding: bytes, as: UTF8.self)
     }
+    // Where each module was loaded and which one holds the fault's RIP, with the code bytes there.
+    private func moduleMap(_ engine: OpaquePointer, rip: UInt64) -> String {
+        var text = [CChar](repeating: 0, count: 8192)
+        return maxps4_fex_engine_module_map(engine, rip, &text, text.count) > 0 ? "Modules chargés :\n" + String(cString: text) : "Modules chargés : aucun"
+    }
     // The run's last PS4 calls, oldest first: what a game did before it quit.
     private func recentCalls(_ engine: OpaquePointer) -> String {
         var text = [CChar](repeating: 0, count: 32768)
@@ -536,6 +541,7 @@ final class MaxPS4GameSource: @unchecked Sendable {
             lock.lock(); let live = lastBeat; lock.unlock()
             defer {
                 let text = [result(of: ran, backend: backend, wasStopped: wasStopped, frames: frames, metal: metal.report, fault: fault, relative: relativeRIP),
+                            moduleMap(opened, rip: fault.rip), "",
                             "Fonctions PS4 manquantes appelées (\(missing.called.count) sur \(missing.total) absentes) :",
                             missing.called.isEmpty ? "aucune" : missing.called.joined(separator: "\n"), "",
                             "Derniers appels PS4 en échec :", failedCalls(opened), "",

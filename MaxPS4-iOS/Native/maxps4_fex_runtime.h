@@ -349,6 +349,10 @@ int32_t maxps4_fex_engine_memory_layout(maxps4_fex_engine *engine, uint64_t *app
 // read. Returns 0, a negative errno, or the failing call's status.
 // A game update for the next load_game (NULL or "" for none): its eboot.bin
 // and sce_module/*.prx replace the game's, and it overlays /app0.
+// The modules load_game placed ("  <name> : 0x<start> - 0x<end>" each, relocated),
+// then which module holds address and its offset inside it, with up to 64 code
+// bytes around it (the address marked [xx]). Returns how many modules there are.
+int32_t maxps4_fex_engine_module_map(maxps4_fex_engine *engine, uint64_t address, char *text, size_t capacity);
 int32_t maxps4_fex_engine_set_update(maxps4_fex_engine *engine, const char *directory);
 int32_t maxps4_fex_engine_load_game(maxps4_fex_engine *engine, const char *directory,
     uint64_t *relocation, char *diagnostic, size_t capacity);

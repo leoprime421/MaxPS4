@@ -1007,6 +1007,8 @@ struct maxps4_fex_engine {
     std::atomic<bool> profiling{false};
     uint64_t relocation = 0; // Of the loaded game, for relative profile RIPs.
     std::string update_directory; // For load_game (set_update); empty: none.
+    struct LoadedModule { std::string name; uint64_t start, end; }; // load_game bias, before relocation
+    std::vector<LoadedModule> loaded_modules;
     maxps4::GuestFrame frame;
     uint64_t frame_sequence = 0;
     bool frame_code_cached = false;
@@ -1885,6 +1887,7 @@ extern "C" int32_t maxps4_fex_engine_load_game(maxps4_fex_engine* engine, const 
                 return -ENOEXEC;
             }
         }
+        engine->loaded_modules.clear();
         // 1 MiB aligned, 1 MiB apart, as ps4-orbis-analyze places them.
         std::vector<maxps4_orbis_module> table;
         uint64_t bias = 0x400000;
@@ -1919,6 +1922,7 @@ extern "C" int32_t maxps4_fex_engine_load_game(maxps4_fex_engine* engine, const 
             uint64_t end = 0;
             for (const auto& s : m.metadata.segments)
                 if (s.type == 1 || s.type == 0x61000010) end = std::max(end, s.address + s.memsz);
+            engine->loaded_modules.push_back({m.name, bias, bias + end});
             bias += ((end + 0xfffff) & ~uint64_t{0xfffff}) + 0x100000;
         }
         const int32_t prepared = maxps4_fex_engine_prepare_orbis_general(engine, table.data(), table.size(),
@@ -2094,6 +2098,50 @@ extern "C" int32_t maxps4_fex_engine_read_memory(maxps4_fex_engine* engine,
     uint64_t address, void* destination, size_t bytes) {
     if (!engine || !destination || !bytes || bytes > (256ull << 20)) return -EINVAL;
     return engine->system_memory.read(address,destination,bytes) ? 0 : -EFAULT;
+}
+extern "C" int32_t maxps4_fex_engine_module_map(maxps4_fex_engine* engine, uint64_t address,
+    char* text, size_t capacity) {
+    if (!engine || !text || !capacity) return -EINVAL;
+    text[0] = 0;
+    std::string out;
+    char line[256];
+    const uint64_t r = engine->relocation;
+    const maxps4_fex_engine::LoadedModule* owner = nullptr;
+    for (const auto& m : engine->loaded_modules) {
+        std::snprintf(line, sizeof line, "  %s : 0x%llx - 0x%llx\n", m.name.c_str(),
+            (unsigned long long)(m.start + r), (unsigned long long)(m.end + r));
+        out += line;
+        if (address >= m.start + r && address < m.end + r) owner = &m;
+    }
+    if (owner) {
+        // Offsets are virtual addresses inside the module file (its bias removed).
+        std::snprintf(line, sizeof line, "Adresse 0x%llx = %s + 0x%llx\n", (unsigned long long)address,
+            owner->name.c_str(), (unsigned long long)(address - owner->start - r));
+        out += line;
+        uint8_t bytes[64];
+        for (const uint64_t before : {32ull, 16ull, 0ull}) {
+            if (address < before) continue;
+            const uint64_t from = address - before;
+            size_t n = sizeof bytes - size_t(32 - before);
+            while (n && !engine->system_memory.read(from, bytes, n)) n /= 2;
+            if (!n) continue;
+            std::snprintf(line, sizeof line, "Octets autour (0x%llx = %s + 0x%llx, RIP marqué [ ]) :\n ",
+                (unsigned long long)from, owner->name.c_str(), (unsigned long long)(from - owner->start - r));
+            out += line;
+            for (size_t i = 0; i < n; ++i) {
+                std::snprintf(line, sizeof line, from + i == address ? " [%02x]" : " %02x", bytes[i]);
+                out += line;
+            }
+            out += "\n";
+            break;
+        }
+    } else {
+        std::snprintf(line, sizeof line, "Adresse 0x%llx hors des modules du jeu\n", (unsigned long long)address);
+        out += line;
+    }
+    const size_t n = std::min(capacity - 1, out.size());
+    std::memcpy(text, out.data(), n); text[n] = 0;
+    return int32_t(engine->loaded_modules.size());
 }
 extern "C" int32_t maxps4_fex_engine_write_memory(maxps4_fex_engine* engine,
     uint64_t address, const void* source, size_t bytes, uint64_t* failed_address) {
