@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+export NODE_USE_ENV_PROXY=1
+exec .venv/bin/python herramientas/curiosidades.py "$@"

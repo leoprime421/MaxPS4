@@ -1,0 +1,23 @@
+{
+  "name": "curiosidades-animadas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Curiosidades Animadas: shorts animados con Claude (plantilla gratis)",
+  "scripts": {
+    "estudio": "remotion studio src/index.ts"
+  },
+  "dependencies": {
+    "@react-three/fiber": "8.17.10",
+    "@remotion/cli": "4.0.507",
+    "@remotion/three": "4.0.507",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.507",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.31",
+    "@types/three": "0.170.0",
+    "typescript": "5.9.3"
+  }
+}

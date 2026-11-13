@@ -4,3 +4,8 @@ build/
 scripts/__pycache__/
 MaxPS4-iOS/MaxPS4.xcodeproj/
 MaxPS4-iOS/Resources/Assets.xcassets/
+
+# Curiosidades Animadas (instalación local)
+node_modules/
+.venv/
+salida/

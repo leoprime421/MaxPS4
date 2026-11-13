@@ -1,0 +1,39 @@
+CURIOSIDADES ANIMADAS
+=====================
+
+Haz shorts animados de 20-30 segundos con Claude: muñecos dibujados dentro de escenarios en 3D,
+cámara que se mueve sola y subtítulos grandes. Trae 5 ideas listas para hacer.
+
+
+LO QUE NECESITAS
+----------------
+- Claude (plan Pro o superior) con la app de escritorio (pestaña «Code»).
+- Una cuenta de ElevenLabs para la voz (vale la gratis).
+- Un ordenador Mac o Windows con internet y unos 3 GB libres.
+
+
+CÓMO SE USA
+-----------
+1. Descomprime el ZIP (Mac: doble clic; Windows: botón derecho → «Extraer todo»).
+2. Abre la app de Claude → pestaña «Code» → elige esta carpeta («CuriosidadesAnimadas»).
+   Si Claude pregunta si confías en la carpeta, di que SÍ.
+3. Escribe:   Empezar
+
+Claude instala lo que falta él solo (la primera vez, unos 10 minutos), te enseña las 5 ideas
+y te guía para hacer la voz. No tienes que abrir ningún instalador, ni tocar la seguridad del Mac,
+ni desactivar el antivirus de Windows.
+
+Tus shorts aparecen en la carpeta «Vídeos listos», cada uno con su título y su descripción.
+
+
+¿Y SI PUDIERAS HACER SHORTS DE CUALQUIER COSA?
+----------------------------------------------
+Esta plantilla trae 5 ideas. Dentro de la comunidad Club Creadores IA tienes IDEAS INFINITAS:
+le dices a Claude «hazme un short sobre…» con la curiosidad que se te ocurra, y él comprueba el dato,
+escribe el guion, dibuja los escenarios y te monta el short. Uno detrás de otro, sin límite.
+
+Y además:
+- 5 ideas más ya preparadas, listas para montar.
+- La voz se hace sola: no tienes que grabar ni descargar nada.
+
+Entra aquí: https://www.skool.com/ccia

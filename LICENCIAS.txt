@@ -1,0 +1,25 @@
+LICENCIAS DE LO QUE LLEVA LA PLANTILLA
+======================================
+
+USO DE LA PLANTILLA
+Puedes usarla para hacer y publicar tus propios shorts, también para monetizarlos.
+No está permitido revenderla, compartirla ni volver a distribuirla.
+
+MÚSICA
+«Sneaky Snitch» y «Mischief Maker», de Kevin MacLeod (incompetech.com), licencia Creative Commons BY 4.0:
+hay que citarlas en la descripción del vídeo. La plantilla pone el crédito exacto en el .txt de cada short
+(public/comun/musica/CREDITOS.tsv).
+
+EFECTOS DE SONIDO
+Sintetizados por código (sin licencia que citar), salvo los dos «whoosh», grabaciones CC0 (dominio público)
+de Freesound: https://freesound.org/people/AudioPapkin/sounds/441345 y https://freesound.org/people/D4XX/sounds/607250
+
+IMÁGENES DE FONDO
+Creadas con inteligencia artificial para esta plantilla. Puedes usarlas en tus shorts.
+
+TIPOGRAFÍAS
+Montserrat y Caveat (SIL Open Font License 1.1): uso comercial libre, sin crédito.
+
+MOTOR
+Remotion (licencia de Remotion: gratis para particulares y empresas de hasta 3 personas; consulta remotion.dev/license).
+Three.js (MIT) y React Three Fiber (MIT). faster-whisper (MIT). ffmpeg (LGPL/GPL, a través de imageio-ffmpeg).
