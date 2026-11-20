@@ -11,7 +11,7 @@
 <style>
 /* Layout: one centred "letter" stage; opening the M slides it down and the photos rise out of the V pocket. */
 :root {
-  --paper: #eeebe5;
+  --paper: #ece8e1;
   --paper-deep: #ddd6cb;
   --copper: #a8623c;
   --copper-dark: #6e3a22;
@@ -27,7 +27,6 @@ body {
   margin: 0;
   background-color: var(--paper);
   background-image:
-    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(110, 58, 34, .07) 100%),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .43  0 0 0 0 .33  0 0 0 0 .24  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   color: var(--ink);
   font-family: var(--font-label);
@@ -59,16 +58,19 @@ body {
 .is-open .stage { transform: translateY(calc(var(--u) * 150)); }
 
 .stage > * { position: absolute; }
-.base {
+.base, .intact {
   inset: 0;
   width: 100%;
   height: 100%;
-  -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 98%);
           mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
   user-select: none;
   pointer-events: none;
 }
-.pocket { inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.intact { z-index: 5; }
+.is-busy .intact, .is-open .intact { visibility: hidden; }
+.pocket { inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
+.is-busy .pocket, .is-open .pocket { opacity: 1; }
 
 /* flap = the V of the M, hinged on the top serif line */
 .flap {
@@ -197,11 +199,52 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  min-height: 64px;
+  min-height: 110px;
   transition: transform 1.25s cubic-bezier(.65, 0, .25, 1);
   text-align: center;
 }
 .is-open .hint { transform: translateY(var(--hint-shift, 0px)); }
+.craft {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 46px;
+  width: 100%;
+}
+.craft span {
+  grid-area: 1 / 1;
+  transition: opacity .6s ease, transform .8s cubic-bezier(.2, .8, .2, 1), letter-spacing .8s ease;
+}
+.craft-closed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 500 12px/1 var(--font-label);
+  letter-spacing: .5em;
+  padding-left: .5em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+.craft-closed::before, .craft-closed::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--copper));
+}
+.craft-closed::after { background: linear-gradient(90deg, var(--copper), transparent); }
+.craft-open {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--copper-dark);
+  opacity: 0;
+  transform: translateY(8px) scale(.94);
+}
+.craft-open svg { display: block; width: 120px; height: 10px; margin: 4px auto 0; overflow: visible; }
+.is-open .craft-closed { opacity: 0; letter-spacing: 1.2em; transform: scale(.9); }
+.is-open .craft-open { opacity: 1; transform: none; transition-delay: .9s; }
 .hint p {
   margin: 0;
   font-size: 11px;
@@ -315,7 +358,6 @@ dialog.lightbox[open] { animation: pop .35s cubic-bezier(.2, .9, .3, 1.2); }
       </defs>
       <polygon points="140,54 146,100 230,304 252,304 335,54" fill="url(#velvetIn)" filter="url(#pile)"/>
       <polygon points="140,54 146,100 230,304 252,304 335,54" fill="none" stroke="url(#copperLine)" stroke-width="2.2" stroke-linejoin="round"/>
-      <line x1="138" y1="54" x2="337" y2="54" stroke="#3a1e12" stroke-opacity=".35" stroke-width="3"/>
     </svg>
 
     <div class="cards" id="cards">
@@ -358,10 +400,18 @@ dialog.lightbox[open] { animation: pop .35s cubic-bezier(.2, .9, .3, 1.2); }
       </svg>
     </div>
 
+    <img class="intact" src="img/logo-flap.webp" alt="" width="500" height="430">
+
     <button class="seal" id="seal" type="button" aria-label="Abrir la carta" aria-expanded="false" aria-controls="cards"></button>
   </div>
 
   <div class="hint" id="hint">
+    <div class="craft">
+      <span class="craft-closed">Artesanal</span>
+      <span class="craft-open" aria-hidden="true">Artesanal
+        <svg viewBox="0 0 120 10" aria-hidden="true"><path d="M2 6 C 30 1, 50 9, 60 5 S 95 1, 118 6" fill="none" stroke="#a8623c" stroke-width="1.2" stroke-linecap="round"/><circle cx="60" cy="5" r="2" fill="#a8623c"/></svg>
+      </span>
+    </div>
     <p aria-live="polite"><span class="closed-txt">Toca la flor para abrir</span><span class="open-txt">Toca una foto para verla</span></p>
     <button class="close-btn" id="closeBtn" type="button">Cerrar la carta</button>
   </div>
