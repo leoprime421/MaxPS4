@@ -502,6 +502,16 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   cursor: pointer;
 }
 .dep-list button:hover { background: rgba(168, 98, 60, .08); }
+.dep-list button small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--copper-dark);
+  opacity: .8;
+  font-variant-numeric: tabular-nums;
+}
+.dep-list button[aria-pressed="true"] small { color: var(--card); opacity: .9; }
+.shop-foot .total { font-size: 16px; white-space: nowrap; }
 .dep-list button[aria-pressed="true"] { background: var(--copper); color: var(--card); }
 .dep-list button:focus-visible { outline: 2px solid var(--copper); outline-offset: 1px; }
 .shop-foot {
@@ -698,7 +708,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     </div>
   </div>
   <div class="shop-foot">
-    <output id="summary" aria-live="polite">Elige un departamento en el mapa o en la lista.</output>
+    <output id="summary" aria-live="polite">Elige un departamento para ver el envío y el total.</output>
     <a class="buy-btn" id="confirmBtn" href="#" target="_blank" rel="noopener" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>Pedir por WhatsApp</a>
   </div>
   <div class="done" id="done">
@@ -886,10 +896,25 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   // Número de WhatsApp de MYA con código de país, solo dígitos (ej. '51987654321').
   // Vacío = WhatsApp abre el mensaje y deja elegir el contacto.
   const WHATSAPP = '';
+
+  // Costo de envío desde Cusco, en soles, por zona. Cambia estos montos por tus tarifas reales.
+  const ZONAS = [
+    { precio: 8,  deps: ['Cusco'] },
+    { precio: 12, deps: ['Apurímac', 'Arequipa', 'Ayacucho', 'Madre de Dios', 'Moquegua', 'Puno', 'Tacna'] },
+    { precio: 15, deps: ['Callao', 'Huancavelica', 'Ica', 'Junín', 'Lima'] },
+    { precio: 18, deps: ['Áncash', 'Cajamarca', 'Huánuco', 'La Libertad', 'Lambayeque', 'Pasco', 'Piura', 'San Martín', 'Tumbes'] },
+    { precio: 25, deps: ['Amazonas', 'Loreto', 'Ucayali'] },
+  ];
+  const ENVIO = {};
+  ZONAS.forEach((z) => z.deps.forEach((d) => { ENVIO[d] = z.precio; }));
+  const envio = (dep) => ENVIO[dep] ?? 18;
+  const total = () => Number(current.dataset.price) + envio(chosen);
+
   const orderMsg = () =>
     `¡Hola MYA Manualidades! Quiero hacer un pedido:\n` +
     `• ${current.dataset.caption} — S/ ${current.dataset.price}\n` +
-    `Envío a: ${chosen}\n` +
+    `• Envío a ${chosen} — S/ ${envio(chosen)}\n` +
+    `Total: S/ ${total()}\n` +
     `¿Cómo coordinamos el pago y la entrega?`;
   const setWa = (on) => {
     confirmBtn.setAttribute('aria-disabled', on ? 'false' : 'true');
@@ -908,13 +933,14 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   const gDeps = el('g', {}, map);
   peru.deps.forEach((d) => {
     const path = el('path', { d: d.d, class: 'dep', tabindex: '0', role: 'button', 'aria-label': d.n }, gDeps);
-    el('title', {}, path).textContent = d.n;
+    el('title', {}, path).textContent = `${d.n} · envío S/ ${envio(d.n)}`;
     path.addEventListener('click', () => choose(d.n));
     path.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(d.n); } });
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = d.n;
+    b.innerHTML = `${d.n}<small>Envío S/ ${envio(d.n)}</small>`;
+    b.setAttribute('aria-label', `${d.n}, envío S/ ${envio(d.n)}`);
     b.setAttribute('aria-pressed', 'false');
     b.addEventListener('click', () => choose(d.n));
     li.appendChild(b);
@@ -949,7 +975,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
       o.btn.setAttribute('aria-pressed', o.n === name ? 'true' : 'false');
     });
     d.path.parentNode.appendChild(d.path); // keep the highlighted border on top
-    summary.innerHTML = `<b>${current.dataset.caption}</b> · S/ ${current.dataset.price} · envío a <b>${name}</b>`;
+    summary.innerHTML = `S/ ${current.dataset.price} + envío a ${name} S/ ${envio(name)} = <b class="total">Total S/ ${total()}</b>`;
     setWa(true);
     fly(prev, d);
   }
@@ -998,8 +1024,8 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     pin.setAttribute('visibility', 'visible');
     map.appendChild(label);
     label.setAttribute('x', cx);
-    label.setAttribute('y', cy + R + 20);
-    label.textContent = d.n;
+    label.setAttribute('y', cy + R + 27);
+    label.textContent = `${d.n} · S/ ${envio(d.n)}`;
     pin.animate([{ transform: `translate(${cx}px, ${cy}px) scale(1.25)` }, { transform: `translate(${cx}px, ${cy}px) scale(1)` }],
       { duration: T(300), easing: 'cubic-bezier(.3,1.6,.5,1)' });
   }
@@ -1011,7 +1037,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     pin.setAttribute('visibility', 'hidden');
     label.textContent = '';
     setWa(false);
-    summary.textContent = 'Elige un departamento en el mapa o en la lista.';
+    summary.textContent = 'Elige un departamento para ver el envío y el total.';
     shop.classList.remove('is-done');
     copyBtn.textContent = 'Copiar mensaje';
   }
