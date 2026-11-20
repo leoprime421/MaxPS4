@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MYA Manualidades</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500&display=swap">
+<style>
+/* Layout: one centred "letter" stage; opening the M slides it down and the photos rise out of the V pocket. */
+:root {
+  --paper: #eeebe5;
+  --paper-deep: #ddd6cb;
+  --copper: #a8623c;
+  --copper-dark: #6e3a22;
+  --velvet: #1d5a45;
+  --ink: #4a2a1a;
+  --card: #faf8f4;
+  --font-display: "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --font-label: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(110, 58, 34, .07) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .43  0 0 0 0 .33  0 0 0 0 .24  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  color: var(--ink);
+  font-family: var(--font-label);
+  overflow-x: hidden;
+}
+.scene {
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+}
+
+/* ---------- stage (500 x 430 logo units) ---------- */
+.stage {
+  --W: min(92vw, 560px, 56svh);
+  --u: calc(var(--W) / 500);
+  position: relative;
+  width: var(--W);
+  height: calc(var(--u) * 430);
+  max-width: 100%;
+  transition: transform 1.25s cubic-bezier(.65, 0, .25, 1);
+}
+.is-open .stage { transform: translateY(calc(var(--u) * 150)); }
+
+.stage > * { position: absolute; }
+.base {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
+          mask-image: radial-gradient(closest-side, #000 50%, transparent 100%);
+  user-select: none;
+  pointer-events: none;
+}
+.pocket { inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* flap = the V of the M, hinged on the top serif line */
+.flap {
+  left: calc(var(--u) * 140);
+  top: calc(var(--u) * 54);
+  width: calc(var(--u) * 195);
+  height: calc(var(--u) * 250);
+  transform-origin: 50% 0;
+  transform: perspective(calc(var(--u) * 900)) rotateX(0deg);
+  transform-style: preserve-3d;
+  z-index: 3;
+  pointer-events: none;
+}
+.face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.face.back { transform: rotateX(180deg); }
+
+/* photos rise out of the V pocket: clipped to "inside the V, or above the M" */
+.cards {
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  clip-path: polygon(-80% -250%, 180% -250%, 180% 12.56%, 67% 12.56%, 48.2% 70.7%, 28% 12.56%, -80% 12.56%);
+}
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--u) * 210);
+  height: calc(var(--u) * 297);
+  box-sizing: border-box;
+  padding: calc(var(--u) * 10) calc(var(--u) * 10) 0;
+  margin: 0;
+  border: 0;
+  background: var(--card);
+  border-radius: calc(var(--u) * 3);
+  box-shadow: 0 calc(var(--u) * 14) calc(var(--u) * 30) rgba(74, 42, 26, .28), 0 1px 2px rgba(74, 42, 26, .25);
+  opacity: 0;
+  cursor: zoom-in;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  overflow: hidden;
+}
+.is-open .card { pointer-events: auto; }
+.card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: calc(var(--u) * 1.5);
+  max-width: 100%;
+}
+.card span {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: max(11px, calc(var(--u) * 17));
+  line-height: calc(var(--u) * 34);
+  color: var(--copper-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card:focus-visible { outline: 2px solid var(--copper); outline-offset: 4px; }
+
+/* the flower = the seal button */
+.seal {
+  left: calc(var(--u) * 193);
+  top: calc(var(--u) * 156);
+  width: calc(var(--u) * 112);
+  height: calc(var(--u) * 112);
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 6;
+  -webkit-tap-highlight-color: transparent;
+}
+.seal::before, .seal::after {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  border: 1.5px solid var(--copper);
+  opacity: 0;
+  animation: ring 2.6s ease-out infinite;
+}
+.seal::after { animation-delay: 1.3s; }
+.is-open .seal, .is-busy .seal { pointer-events: none; }
+.is-open .seal::before, .is-open .seal::after,
+.is-busy .seal::before, .is-busy .seal::after { animation: none; opacity: 0; }
+.seal:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+@keyframes ring {
+  0% { transform: scale(.85); opacity: .7; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+.spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f3c9a4, var(--copper) 60%, var(--copper-dark));
+  pointer-events: none;
+  z-index: 7;
+}
+
+/* ---------- caption line under the stage ---------- */
+.hint {
+  position: relative;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  transition: transform 1.25s cubic-bezier(.65, 0, .25, 1);
+  text-align: center;
+}
+.is-open .hint { transform: translateY(var(--hint-shift, 0px)); }
+.hint p {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--copper-dark);
+}
+.hint p .open-txt { display: none; }
+.is-open .hint p .closed-txt { display: none; }
+.is-open .hint p .open-txt { display: inline; }
+.close-btn {
+  font: 500 11px/1 var(--font-label);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--copper-dark);
+  background: transparent;
+  border: 1px solid rgba(110, 58, 34, .45);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .4s ease, background-color .2s ease, visibility 0s .4s;
+}
+.is-open .close-btn { opacity: 1; visibility: visible; transition: opacity .6s ease 1.6s, background-color .2s ease, visibility 0s 0s; }
+.close-btn:hover { background: rgba(168, 98, 60, .1); }
+.close-btn:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+
+/* ---------- lightbox ---------- */
+dialog.lightbox {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: min(92vw, 640px);
+  max-height: 92svh;
+  overflow: visible;
+}
+dialog.lightbox::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur(3px); }
+.lightbox figure {
+  margin: 0;
+  background: var(--card);
+  padding: 12px 12px 0;
+  border-radius: 4px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
+}
+.lightbox img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(92svh - 70px);
+  width: auto;
+  margin: 0 auto;
+  border-radius: 2px;
+}
+.lightbox figcaption {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 52px;
+  text-align: center;
+  color: var(--copper-dark);
+}
+.lb-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--copper);
+  color: var(--card);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+}
+.lb-close:focus-visible { outline: 2px solid var(--card); outline-offset: 2px; }
+dialog.lightbox[open] { animation: pop .35s cubic-bezier(.2, .9, .3, 1.2); }
+@keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage, .hint { transition: none; }
+  .seal::before, .seal::after { animation: none; opacity: .5; }
+}
+</style>
+</head>
+<body>
+<main class="scene" id="scene">
+  <div class="stage" id="stage">
+    <img class="base" src="img/logo-base.webp" alt="MYA Manualidades" width="500" height="430">
+
+    <!-- inside of the envelope (revealed when the V opens) -->
+    <svg class="pocket" viewBox="0 0 500 430" aria-hidden="true">
+      <defs>
+        <radialGradient id="velvetIn" cx="50%" cy="20%" r="85%">
+          <stop offset="0" stop-color="#0d3326"/>
+          <stop offset=".55" stop-color="#17503d"/>
+          <stop offset="1" stop-color="#226650"/>
+        </radialGradient>
+        <filter id="pile" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="4" result="t"/>
+          <feColorMatrix in="t" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0" result="n"/>
+          <feComposite in="n" in2="SourceGraphic" operator="in" result="nn"/>
+          <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="nn"/></feMerge>
+        </filter>
+        <linearGradient id="copperLine" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#d79a72"/>
+          <stop offset=".5" stop-color="#a8623c"/>
+          <stop offset="1" stop-color="#6e3a22"/>
+        </linearGradient>
+      </defs>
+      <polygon points="140,54 146,100 230,304 252,304 335,54" fill="url(#velvetIn)" filter="url(#pile)"/>
+      <polygon points="140,54 146,100 230,304 252,304 335,54" fill="none" stroke="url(#copperLine)" stroke-width="2.2" stroke-linejoin="round"/>
+      <line x1="138" y1="54" x2="337" y2="54" stroke="#3a1e12" stroke-opacity=".35" stroke-width="3"/>
+    </svg>
+
+    <div class="cards" id="cards">
+      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" aria-label="Ver foto: Nacimiento navideño" tabindex="-1">
+        <img src="img/belen.webp" alt="Nacimiento con María, José y el Niño, figuras hechas a mano con aureolas de filigrana dorada" width="768" height="1024">
+        <span>Nacimiento navideño</span>
+      </button>
+      <button class="card" type="button" id="cardB" data-full="img/collar.webp" data-caption="Collar flor de cobre" aria-label="Ver foto: Collar flor de cobre" tabindex="-1">
+        <img src="img/collar.webp" alt="Collar con colgante de flor tejida en alambre de cobre y cristal negro al centro" width="900" height="1200">
+        <span>Collar flor de cobre</span>
+      </button>
+    </div>
+
+    <div class="flap" id="flap" aria-hidden="true">
+      <svg class="face front" viewBox="140 54 195 250">
+        <defs>
+          <clipPath id="flapClip" clipPathUnits="userSpaceOnUse">
+            <polygon points="140,54 146,100 230,304 252,304 335,54"/>
+            <circle cx="249" cy="212" r="56"/>
+          </clipPath>
+        </defs>
+        <image href="img/logo-flap.webp" x="0" y="0" width="500" height="430" clip-path="url(#flapClip)"/>
+      </svg>
+      <svg class="face back" viewBox="140 54 195 250">
+        <defs>
+          <linearGradient id="velvetOut" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#14473a"/>
+            <stop offset="1" stop-color="#2a7559"/>
+          </linearGradient>
+          <clipPath id="sealClip" clipPathUnits="userSpaceOnUse">
+            <circle cx="249" cy="146" r="50"/>
+          </clipPath>
+        </defs>
+        <polygon points="140,304 146,258 230,54 252,54 335,304" fill="url(#velvetOut)" filter="url(#pile)"/>
+        <polygon points="140,304 146,258 230,54 252,54 335,304" fill="none" stroke="url(#copperLine)" stroke-width="2.4" stroke-linejoin="round"/>
+        <polygon points="151,298 156,259 233,68 249,68 324,298" fill="none" stroke="#d9a07a" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0 6.5"/>
+        <g clip-path="url(#sealClip)">
+          <image href="img/logo-flap.webp" x="0" y="-66" width="500" height="430"/>
+        </g>
+      </svg>
+    </div>
+
+    <button class="seal" id="seal" type="button" aria-label="Abrir la carta" aria-expanded="false" aria-controls="cards"></button>
+  </div>
+
+  <div class="hint" id="hint">
+    <p aria-live="polite"><span class="closed-txt">Toca la flor para abrir</span><span class="open-txt">Toca una foto para verla</span></p>
+    <button class="close-btn" id="closeBtn" type="button">Cerrar la carta</button>
+  </div>
+</main>
+
+<dialog class="lightbox" id="lightbox" aria-label="Foto ampliada">
+  <figure>
+    <img id="lbImg" src="" alt="">
+    <figcaption id="lbCap"></figcaption>
+  </figure>
+  <button class="lb-close" id="lbClose" type="button" aria-label="Cerrar foto">×</button>
+</dialog>
+
+<script>
+(() => {
+  const scene = document.getElementById('scene');
+  const stage = document.getElementById('stage');
+  const flap = document.getElementById('flap');
+  const seal = document.getElementById('seal');
+  const hint = document.getElementById('hint');
+  const closeBtn = document.getElementById('closeBtn');
+  const cards = [document.getElementById('cardA'), document.getElementById('cardB')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const T = (ms) => (reduce ? 0 : ms);
+
+  let open = false, busy = false;
+  const u = () => stage.clientWidth / 500;
+
+  // card poses in logo units: [centreX, centreY, rotate, scale]
+  const POSE = {
+    hidden: [[242, 222, 0, .26], [242, 222, 0, .26]],
+    rise:   [[236, -40, -2, .5], [248, -40, 2, .5]],
+    final:  [[132, -168, -7, 1], [366, -180, 6, 1]],
+  };
+  const tf = ([x, y, r, s]) => {
+    const k = u();
+    return `translate(${(x - 105) * k}px, ${(y - 148.5) * k}px) rotate(${r}deg) scale(${s})`;
+  };
+  const flapTf = (deg) => `perspective(${900 * u()}px) rotateX(${deg}deg)`;
+  const setHintShift = () => hint.style.setProperty('--hint-shift', `${150 * u()}px`);
+
+  cards.forEach((c, i) => { c.style.transform = tf(POSE.hidden[i]); });
+
+  function sparks() {
+    if (reduce) return;
+    const k = u(), cx = 249 * k, cy = 212 * k;
+    for (let i = 0; i < 22; i++) {
+      const s = document.createElement('i');
+      s.className = 'spark';
+      s.style.left = cx + 'px';
+      s.style.top = cy + 'px';
+      stage.appendChild(s);
+      const a = (i / 22) * Math.PI * 2 + Math.random() * .3;
+      const d = (50 + Math.random() * 70) * k;
+      const sz = .5 + Math.random() * .9;
+      s.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d - 20 * k}px) scale(${sz})`, opacity: 0 }
+      ], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(.15,.7,.3,1)' }).onfinish = () => s.remove();
+    }
+  }
+
+  const anim = (el, frames, opts) => el.animate(frames, { fill: 'forwards', ...opts });
+
+  async function openLetter() {
+    if (open || busy) return;
+    busy = true;
+    scene.classList.add('is-busy');
+    setHintShift();
+    sparks();
+
+    // seal press
+    anim(flap, [
+      { transform: flapTf(0) },
+      { transform: flapTf(-8), offset: .5 },
+      { transform: flapTf(0) }
+    ], { duration: T(320), easing: 'ease-out' });
+    await wait(T(260));
+
+    scene.classList.add('is-open');
+    seal.setAttribute('aria-expanded', 'true');
+
+    // flap folds up over the top serif
+    const f = anim(flap, [
+      { transform: flapTf(0) },
+      { transform: flapTf(-95), offset: .5 },
+      { transform: flapTf(-180) }
+    ], { duration: T(1100), easing: 'cubic-bezier(.55,.05,.35,1)' });
+
+    // photos rise out of the pocket, then fan out
+    cards.forEach((c, i) => {
+      const delay = T(700 + i * 260);
+      anim(c, [
+        { transform: tf(POSE.hidden[i]), opacity: 0 },
+        { transform: tf(POSE.hidden[i]), opacity: 1, offset: .08 },
+        { transform: tf(POSE.rise[i]), opacity: 1, offset: .45 },
+        { transform: tf(POSE.final[i]), opacity: 1 }
+      ], { duration: T(1700), delay, easing: 'cubic-bezier(.45,0,.2,1)' });
+      c.tabIndex = 0;
+    });
+
+    await f.finished;
+    await wait(T(1100));
+    open = true;
+    commit();
+    busy = false;
+    scene.classList.remove('is-busy');
+    cards[0].focus({ preventScroll: true });
+  }
+
+  async function closeLetter() {
+    if (!open || busy) return;
+    busy = true;
+    scene.classList.add('is-busy');
+    const back = cards.map((c, i) => anim(c, [
+      { transform: tf(POSE.final[i]), opacity: 1 },
+      { transform: tf(POSE.rise[i]), opacity: 1, offset: .5 },
+      { transform: tf(POSE.hidden[i]), opacity: 1, offset: .92 },
+      { transform: tf(POSE.hidden[i]), opacity: 0 }
+    ], { duration: T(1200), delay: T((1 - i) * 180), easing: 'cubic-bezier(.5,0,.3,1)' }));
+    await Promise.all(back.map((a) => a.finished));
+    scene.classList.remove('is-open');
+    const f = anim(flap, [
+      { transform: flapTf(-180) },
+      { transform: flapTf(-85), offset: .5 },
+      { transform: flapTf(0) }
+    ], { duration: T(1000), easing: 'cubic-bezier(.55,.05,.35,1)' });
+    await f.finished;
+    cards.forEach((c) => { c.tabIndex = -1; });
+    open = false;
+    commit();
+    seal.setAttribute('aria-expanded', 'false');
+    busy = false;
+    scene.classList.remove('is-busy');
+    seal.focus({ preventScroll: true });
+  }
+
+  // write the resting pose as inline styles (so resize can recompute) and drop the animations
+  function commit() {
+    flap.getAnimations().forEach((a) => a.cancel());
+    cards.forEach((c) => c.getAnimations().forEach((a) => a.cancel()));
+    flap.style.transform = flapTf(open ? -180 : 0);
+    cards.forEach((c, i) => {
+      c.style.transform = tf(open ? POSE.final[i] : POSE.hidden[i]);
+      c.style.opacity = open ? '1' : '0';
+    });
+    setHintShift();
+  }
+
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  seal.addEventListener('click', openLetter);
+  closeBtn.addEventListener('click', closeLetter);
+  addEventListener('resize', () => { if (!busy) commit(); });
+
+  // lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbCap = document.getElementById('lbCap');
+  cards.forEach((c) => c.addEventListener('click', () => {
+    if (!open) return;
+    lbImg.src = c.dataset.full;
+    lbImg.alt = c.querySelector('img').alt;
+    lbCap.textContent = c.dataset.caption;
+    if (lb.showModal) lb.showModal(); else lb.setAttribute('open', '');
+  }));
+  const closeLb = () => (lb.close ? lb.close() : lb.removeAttribute('open'));
+  document.getElementById('lbClose').addEventListener('click', closeLb);
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+})();
+</script>
+</body>
+</html>
