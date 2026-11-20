@@ -291,7 +291,8 @@ dialog.lightbox::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: 
   border-radius: 4px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
 }
-.lightbox img {
+.lightbox .spin { width: min(calc(92vw - 24px), calc(92svh - 120px), 600px); }
+.lightbox img:not(.fr) {
   display: block;
   max-width: 100%;
   max-height: calc(92svh - 120px);
@@ -581,6 +582,103 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   .buy-btn { padding: 12px 18px; }
 }
 
+
+[hidden] { display: none !important; }
+/* ---------- 360° viewer ---------- */
+.media { position: relative; }
+.view-tabs {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(250, 248, 244, .94);
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+}
+.view-tabs button {
+  font: 600 11px/1 var(--font-label);
+  letter-spacing: .12em;
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--copper-dark);
+  cursor: pointer;
+}
+.view-tabs button[aria-pressed="true"] { background: var(--copper); color: var(--card); }
+.view-tabs button:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.spin {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #d1cfd4;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.spin:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+.spin img.fr { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; max-width: none; }
+.spin-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(40, 22, 14, .62);
+  color: #fff;
+  font: 500 10.5px/1 var(--font-label);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+.spin.touched .spin-hint { opacity: 0; }
+.spin-deg {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  font: 600 12px/1 var(--font-label);
+  color: var(--copper-dark);
+  background: rgba(250, 248, 244, .9);
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.spin-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(250, 248, 244, .92);
+  color: var(--copper-dark);
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-50%);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+.spin-arrow.l { left: 10px; }
+.spin-arrow.r { right: 10px; }
+.spin-arrow:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: reduce) {
   .stage, .hint { transition: none; }
   .seal::before, .seal::after { animation: none; opacity: .5; }
@@ -617,7 +715,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     </svg>
 
     <div class="cards" id="cards">
-      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
+      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" data-spin="img/nacimiento-360/" data-spin-n="8" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
         <img src="img/belen.webp" alt="Nacimiento con María, José y el Niño, figuras hechas a mano con aureolas de filigrana dorada" width="768" height="1024">
         <span>Nacimiento navideño</span>
         <b class="tag">S/ 120</b>
@@ -670,8 +768,18 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 </main>
 
 <dialog class="lightbox" id="lightbox" aria-label="Foto ampliada">
-  <figure>
+  <figure class="media" id="lbMedia">
     <img id="lbImg" src="" alt="">
+    <div class="spin" tabindex="0" role="img" aria-roledescription="vista 360°" hidden>
+      <span class="spin-deg">0°</span>
+      <span class="spin-hint"><svg width="16" height="10" viewBox="0 0 16 10" aria-hidden="true"><path d="M5 1 1 5l4 4M11 1l4 4-4 4M1 5h14" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hint-txt">Desliza para girar</span></span>
+      <button class="spin-arrow l" type="button" aria-label="Girar a la izquierda">‹</button>
+      <button class="spin-arrow r" type="button" aria-label="Girar a la derecha">›</button>
+    </div>
+    <div class="view-tabs" role="group" aria-label="Tipo de vista" hidden>
+      <button type="button" data-v="foto" aria-pressed="true">Foto</button>
+      <button type="button" data-v="360" aria-pressed="false">360°</button>
+    </div>
     <figcaption>
       <span id="lbCap"></span>
       <span class="lb-buy">
@@ -863,6 +971,107 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   addEventListener('resize', () => { if (!busy) commit(); });
 
   // lightbox
+  // ---------- 360° viewer: crossfades between the turntable frames ----------
+  function makeViewer(media, photo) {
+    const spin = media.querySelector('.spin');
+    const tabs = media.querySelector('.view-tabs');
+    const deg = spin.querySelector('.spin-deg');
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    spin.querySelector('.hint-txt').textContent = fine ? 'Mueve el cursor para girar' : 'Desliza para girar';
+    let frames = [], n = 0, a = 0, raf = 0, lastT = 0, auto = true, vel = 0, tween = null, drag = null, lastX = null;
+    const render = () => {
+      if (!n) return;
+      const m = ((a % n) + n) % n, i = Math.floor(m), j = (i + 1) % n, f = m - i;
+      frames.forEach((im, k) => {
+        im.style.opacity = k === i ? 1 : k === j ? f : 0;
+        im.style.zIndex = k === j ? 2 : k === i ? 1 : 0;
+      });
+      deg.textContent = Math.round(m * 360 / n) % 360 + '°';
+    };
+    const loop = (t) => {
+      const dt = lastT ? Math.min(50, t - lastT) : 16;
+      lastT = t;
+      if (tween) {
+        const k = Math.min(1, (t - tween.t0) / 380), e = 1 - Math.pow(1 - k, 3);
+        a = tween.from + (tween.to - tween.from) * e;
+        if (k >= 1) tween = null;
+      } else if (!drag && Math.abs(vel) > .0004) {
+        a += vel * dt; vel *= Math.pow(.94, dt / 16);
+      } else if (auto && !reduce) {
+        a += dt * n / 9000;
+      }
+      render();
+      raf = requestAnimationFrame(loop);
+    };
+    const touched = () => { auto = false; spin.classList.add('touched'); };
+    const perPx = () => n / Math.max(200, spin.clientWidth * 1.1);
+    spin.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.spin-arrow')) return;
+      drag = { x: e.clientX, t: performance.now() }; vel = 0; tween = null; touched();
+      if (e.pointerType !== 'mouse') spin.setPointerCapture(e.pointerId);
+    });
+    spin.addEventListener('pointermove', (e) => {
+      if (e.target.closest('.spin-arrow')) { lastX = null; return; }
+      if (drag) {
+        const now = performance.now(), dx = e.clientX - drag.x;
+        a -= dx * perPx();
+        vel = (-dx * perPx()) / Math.max(8, now - drag.t);
+        drag = { x: e.clientX, t: now };
+      } else if (e.pointerType === 'mouse') {
+        if (lastX !== null) { a += (e.clientX - lastX) * perPx(); touched(); tween = null; vel = 0; }
+        lastX = e.clientX;
+      }
+    });
+    const endDrag = () => { if (drag && performance.now() - drag.t > 80) vel = 0; drag = null; };
+    spin.addEventListener('pointerup', endDrag);
+    spin.addEventListener('pointercancel', endDrag);
+    spin.addEventListener('pointerleave', () => { lastX = null; if (drag && !spin.hasPointerCapture) endDrag(); });
+    const step = (d) => { touched(); vel = 0; tween = { from: a, to: Math.round(a) + d, t0: performance.now() }; };
+    spin.querySelector('.spin-arrow.l').addEventListener('click', () => step(-1));
+    spin.querySelector('.spin-arrow.r').addEventListener('click', () => step(1));
+    spin.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    });
+    const start = () => { if (!raf) { lastT = 0; raf = requestAnimationFrame(loop); } };
+    const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+    function setView(v) {
+      const is360 = v === '360';
+      tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'));
+      spin.hidden = !is360;
+      photo.hidden = is360;
+      if (is360) start(); else stop();
+    }
+    tabs.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
+    return {
+      // spin = { base: 'carpeta/', n: 8 } or null
+      load(spinData, label) {
+        stop();
+        frames.forEach((im) => im.remove());
+        frames = []; n = 0; a = 0; vel = 0; tween = null; auto = true;
+        spin.classList.remove('touched');
+        tabs.hidden = !spinData;
+        if (spinData) {
+          n = spinData.n;
+          for (let k = 0; k < n; k++) {
+            const im = new Image();
+            im.className = 'fr';
+            im.src = `${spinData.base}${k}.webp`;
+            im.alt = '';
+            im.draggable = false;
+            im.decoding = 'async';
+            spin.insertBefore(im, spin.firstChild);
+            frames.push(im);
+          }
+          spin.setAttribute('aria-label', `${label}, vista de 360 grados. Usa las flechas para girar.`);
+          render();
+        }
+        setView('foto');
+      },
+      stop: () => setView('foto'),
+    };
+  }
+  const viewer = makeViewer(document.getElementById('lbMedia'), document.getElementById('lbImg'));
   const lb = document.getElementById('lightbox');
   const lbImg = document.getElementById('lbImg');
   const lbCap = document.getElementById('lbCap');
@@ -874,9 +1083,11 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     lbCap.textContent = c.dataset.caption;
     document.getElementById('lbPrice').textContent = 'S/ ' + c.dataset.price;
     current = c;
+    viewer.load(c.dataset.spin ? { base: c.dataset.spin, n: Number(c.dataset.spinN) } : null, c.dataset.caption);
     if (lb.showModal) lb.showModal(); else lb.setAttribute('open', '');
   }));
   const closeLb = () => (lb.close ? lb.close() : lb.removeAttribute('open'));
+  lb.addEventListener('close', () => viewer.stop());
   document.getElementById('lbClose').addEventListener('click', closeLb);
   lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
 

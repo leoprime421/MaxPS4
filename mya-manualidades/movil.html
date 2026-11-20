@@ -339,6 +339,9 @@ dialog.sheet[open] { animation: fade .3s ease; }
   box-shadow: 0 12px 28px rgba(74, 42, 26, .25);
 }
 .sheet-text { text-align: center; padding-top: 16px; }
+.sheet .spin { width: min(52svh, 520px, 100%); }
+.sheet .view-tabs { left: 50%; transform: translateX(-50%); top: auto; bottom: -18px; }
+.sheet .media { margin-bottom: 14px; }
 .sheet-text h2 { margin: 0; font: italic 500 30px/1.1 var(--font-display); color: var(--copper-dark); }
 .sheet-text .price { display: block; margin-top: 6px; font-size: 28px; }
 .sheet-text p { margin: 10px auto 0; max-width: 40ch; font-size: 14px; line-height: 1.6; }
@@ -647,6 +650,102 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 
 
 
+[hidden] { display: none !important; }
+/* ---------- 360° viewer ---------- */
+.media { position: relative; }
+.view-tabs {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(250, 248, 244, .94);
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+}
+.view-tabs button {
+  font: 600 11px/1 var(--font-label);
+  letter-spacing: .12em;
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--copper-dark);
+  cursor: pointer;
+}
+.view-tabs button[aria-pressed="true"] { background: var(--copper); color: var(--card); }
+.view-tabs button:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.spin {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #d1cfd4;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.spin:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+.spin img.fr { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; max-width: none; }
+.spin-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(40, 22, 14, .62);
+  color: #fff;
+  font: 500 10.5px/1 var(--font-label);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+.spin.touched .spin-hint { opacity: 0; }
+.spin-deg {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  font: 600 12px/1 var(--font-label);
+  color: var(--copper-dark);
+  background: rgba(250, 248, 244, .9);
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.spin-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(250, 248, 244, .92);
+  color: var(--copper-dark);
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-50%);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+.spin-arrow.l { left: 10px; }
+.spin-arrow.r { right: 10px; }
+.spin-arrow:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .cue svg, .sheet .fadeup { animation: none; }
@@ -694,7 +793,19 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   <button class="sheet-close" id="sheetClose" type="button" aria-label="Cerrar">×</button>
   <div class="sheet-in">
     <div class="sheet-grip"></div>
+    <div class="media" id="sheetMedia">
     <img class="sheet-photo" id="sheetPhoto" src="" alt="">
+    <div class="spin" tabindex="0" role="img" aria-roledescription="vista 360°" hidden>
+      <span class="spin-deg">0°</span>
+      <span class="spin-hint"><svg width="16" height="10" viewBox="0 0 16 10" aria-hidden="true"><path d="M5 1 1 5l4 4M11 1l4 4-4 4M1 5h14" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hint-txt">Desliza para girar</span></span>
+      <button class="spin-arrow l" type="button" aria-label="Girar a la izquierda">‹</button>
+      <button class="spin-arrow r" type="button" aria-label="Girar a la derecha">›</button>
+    </div>
+    <div class="view-tabs" role="group" aria-label="Tipo de vista" hidden>
+      <button type="button" data-v="foto" aria-pressed="true">Foto</button>
+      <button type="button" data-v="360" aria-pressed="false">360°</button>
+    </div>
+    </div>
     <div class="sheet-text fadeup">
       <h2 id="sheetName"></h2>
       <strong class="price" id="sheetPrice"></strong>
@@ -751,6 +862,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   ];
   const PRODUCTOS = [
     { cat: 'munecos', nombre: 'Nacimiento navideño', precio: 120, img: 'img/belen.webp',
+      spin: { base: 'img/nacimiento-360/', n: 8 },
       alt: 'Nacimiento con María, José y el Niño hechos a mano, con aureolas de filigrana dorada',
       desc: 'María, José y el Niño hechos a mano, con aureolas de filigrana dorada.' },
     { cat: 'collares', nombre: 'Collar flor de cobre', precio: 35, img: 'img/collar.webp',
@@ -844,11 +956,114 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   // ---------- product sheet with flying photo ----------
   const sheet = document.getElementById('sheet');
   const sheetPhoto = document.getElementById('sheetPhoto');
+
+  // ---------- 360° viewer: crossfades between the turntable frames ----------
+  function makeViewer(media, photo) {
+    const spin = media.querySelector('.spin');
+    const tabs = media.querySelector('.view-tabs');
+    const deg = spin.querySelector('.spin-deg');
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    spin.querySelector('.hint-txt').textContent = fine ? 'Mueve el cursor para girar' : 'Desliza para girar';
+    let frames = [], n = 0, a = 0, raf = 0, lastT = 0, auto = true, vel = 0, tween = null, drag = null, lastX = null;
+    const render = () => {
+      if (!n) return;
+      const m = ((a % n) + n) % n, i = Math.floor(m), j = (i + 1) % n, f = m - i;
+      frames.forEach((im, k) => {
+        im.style.opacity = k === i ? 1 : k === j ? f : 0;
+        im.style.zIndex = k === j ? 2 : k === i ? 1 : 0;
+      });
+      deg.textContent = Math.round(m * 360 / n) % 360 + '°';
+    };
+    const loop = (t) => {
+      const dt = lastT ? Math.min(50, t - lastT) : 16;
+      lastT = t;
+      if (tween) {
+        const k = Math.min(1, (t - tween.t0) / 380), e = 1 - Math.pow(1 - k, 3);
+        a = tween.from + (tween.to - tween.from) * e;
+        if (k >= 1) tween = null;
+      } else if (!drag && Math.abs(vel) > .0004) {
+        a += vel * dt; vel *= Math.pow(.94, dt / 16);
+      } else if (auto && !reduce) {
+        a += dt * n / 9000;
+      }
+      render();
+      raf = requestAnimationFrame(loop);
+    };
+    const touched = () => { auto = false; spin.classList.add('touched'); };
+    const perPx = () => n / Math.max(200, spin.clientWidth * 1.1);
+    spin.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.spin-arrow')) return;
+      drag = { x: e.clientX, t: performance.now() }; vel = 0; tween = null; touched();
+      if (e.pointerType !== 'mouse') spin.setPointerCapture(e.pointerId);
+    });
+    spin.addEventListener('pointermove', (e) => {
+      if (e.target.closest('.spin-arrow')) { lastX = null; return; }
+      if (drag) {
+        const now = performance.now(), dx = e.clientX - drag.x;
+        a -= dx * perPx();
+        vel = (-dx * perPx()) / Math.max(8, now - drag.t);
+        drag = { x: e.clientX, t: now };
+      } else if (e.pointerType === 'mouse') {
+        if (lastX !== null) { a += (e.clientX - lastX) * perPx(); touched(); tween = null; vel = 0; }
+        lastX = e.clientX;
+      }
+    });
+    const endDrag = () => { if (drag && performance.now() - drag.t > 80) vel = 0; drag = null; };
+    spin.addEventListener('pointerup', endDrag);
+    spin.addEventListener('pointercancel', endDrag);
+    spin.addEventListener('pointerleave', () => { lastX = null; if (drag && !spin.hasPointerCapture) endDrag(); });
+    const step = (d) => { touched(); vel = 0; tween = { from: a, to: Math.round(a) + d, t0: performance.now() }; };
+    spin.querySelector('.spin-arrow.l').addEventListener('click', () => step(-1));
+    spin.querySelector('.spin-arrow.r').addEventListener('click', () => step(1));
+    spin.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    });
+    const start = () => { if (!raf) { lastT = 0; raf = requestAnimationFrame(loop); } };
+    const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+    function setView(v) {
+      const is360 = v === '360';
+      tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'));
+      spin.hidden = !is360;
+      photo.hidden = is360;
+      if (is360) start(); else stop();
+    }
+    tabs.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
+    return {
+      // spin = { base: 'carpeta/', n: 8 } or null
+      load(spinData, label) {
+        stop();
+        frames.forEach((im) => im.remove());
+        frames = []; n = 0; a = 0; vel = 0; tween = null; auto = true;
+        spin.classList.remove('touched');
+        tabs.hidden = !spinData;
+        if (spinData) {
+          n = spinData.n;
+          for (let k = 0; k < n; k++) {
+            const im = new Image();
+            im.className = 'fr';
+            im.src = `${spinData.base}${k}.webp`;
+            im.alt = '';
+            im.draggable = false;
+            im.decoding = 'async';
+            spin.insertBefore(im, spin.firstChild);
+            frames.push(im);
+          }
+          spin.setAttribute('aria-label', `${label}, vista de 360 grados. Usa las flechas para girar.`);
+          render();
+        }
+        setView('foto');
+      },
+      stop: () => setView('foto'),
+    };
+  }
+  const viewer = makeViewer(document.getElementById('sheetMedia'), sheetPhoto);
   let current = null;
   function openSheet(p, card) {
     current = { dataset: { caption: p.nombre, price: String(p.precio), full: p.img } };
     sheetPhoto.src = p.img;
     sheetPhoto.alt = p.alt;
+    viewer.load(p.spin || null, p.nombre);
     document.getElementById('sheetName').textContent = p.nombre;
     document.getElementById('sheetPrice').textContent = 'S/ ' + p.precio;
     document.getElementById('sheetDesc').textContent = p.desc;
@@ -880,6 +1095,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
     });
   }
   const closeLb = () => sheet.close();
+  sheet.addEventListener('close', () => viewer.stop());
   document.getElementById('sheetClose').addEventListener('click', closeLb);
   sheet.addEventListener('click', (e) => { if (e.target === sheet) closeLb(); });
 
