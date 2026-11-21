@@ -617,7 +617,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   margin: 0 auto;
   overflow: hidden;
   border-radius: 4px;
-  background: #d1cfd4;
+  background: #fff;
   touch-action: pan-y;
   cursor: ew-resize;
   user-select: none;
@@ -1006,7 +1006,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     </svg>
 
     <div class="cards" id="cards">
-      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" data-spin="img/nacimiento-360/" data-spin-n="8" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
+      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" data-spin="img/jose-360/" data-spin-n="8" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
         <img src="img/belen.webp" alt="Nacimiento con María, José y el Niño, figuras hechas a mano con aureolas de filigrana dorada" width="768" height="1024">
         <span>Nacimiento navideño</span>
         <b class="tag">S/ 120</b>
@@ -1332,7 +1332,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     let frames = [], n = 0, a = 0, raf = 0, lastT = 0, auto = true, vel = 0, tween = null, drag = null, lastX = null;
     const render = () => {
       if (!n) return;
-      const m = ((a % n) + n) % n, i = Math.floor(m), j = (i + 1) % n, f = m - i;
+      const m = ((a % n) + n) % n, i = Math.floor(m), j = (i + 1) % n, f = Math.min(1, Math.max(0, (m - i - .3) / .4));
       frames.forEach((im, k) => {
         im.style.opacity = k === i ? 1 : k === j ? f : 0;
         im.style.zIndex = k === j ? 2 : k === i ? 1 : 0;
