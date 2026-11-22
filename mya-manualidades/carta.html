@@ -291,7 +291,7 @@ dialog.lightbox::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: 
   border-radius: 4px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
 }
-.lightbox .spin { width: min(calc(92vw - 24px), calc(92svh - 120px), 600px); }
+.lightbox .spin, .lightbox .m3d { width: min(calc(92vw - 24px), calc(92svh - 120px), 600px); }
 .lightbox img:not(.fr) {
   display: block;
   max-width: 100%;
@@ -585,6 +585,36 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 
 [hidden] { display: none !important; }
 /* ---------- 360° viewer ---------- */
+.m3d {
+  position: relative;
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 4px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #fff, #f1ece5);
+}
+.m3d model-viewer { width: 100%; height: 100%; display: block; --poster-color: transparent; }
+.m3d-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 3;
+  transform: translateX(-50%);
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(40, 22, 14, .62);
+  color: #fff;
+  font: 500 10.5px/1 var(--font-label);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+.m3d.touched .m3d-hint { opacity: 0; }
+.m3d-load { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--copper-dark); }
+
 .media { position: relative; }
 .view-tabs {
   position: absolute;
@@ -1006,7 +1036,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     </svg>
 
     <div class="cards" id="cards">
-      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" data-spin="img/jose-360/" data-spin-n="8" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
+      <button class="card" type="button" id="cardA" data-full="img/belen.webp" data-caption="Nacimiento navideño" data-price="120" data-spin="img/jose-360/" data-spin-n="8" data-model="img/modelo-3d.glb" aria-label="Ver foto: Nacimiento navideño, S/ 120" tabindex="-1">
         <img src="img/belen.webp" alt="Nacimiento con María, José y el Niño, figuras hechas a mano con aureolas de filigrana dorada" width="768" height="1024">
         <span>Nacimiento navideño</span>
         <b class="tag">S/ 120</b>
@@ -1070,7 +1100,9 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <div class="view-tabs" role="group" aria-label="Tipo de vista" hidden>
       <button type="button" data-v="foto" aria-pressed="true">Foto</button>
       <button type="button" data-v="360" aria-pressed="false">360°</button>
+      <button type="button" data-v="3d" aria-pressed="false">3D</button>
     </div>
+    <div class="m3d" hidden><span class="m3d-load">Cargando 3D…</span><span class="m3d-hint">Arrastra para girar · pellizca para acercar</span></div>
     <figcaption>
       <span id="lbCap"></span>
       <span class="lb-buy">
@@ -1322,9 +1354,23 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   addEventListener('resize', () => { if (!busy) commit(); });
 
   // lightbox
+
+  // 3D model: the viewer library loads only the first time someone opens a 3D view
+  let mvLoading = null;
+  const loadModelViewer = () => mvLoading || (mvLoading = new Promise((ok, fail) => {
+    if (window.customElements && customElements.get('model-viewer')) return ok();
+    const s = document.createElement('script');
+    s.type = 'module';
+    s.src = 'lib/model-viewer.min.js';
+    s.onload = () => customElements.whenDefined('model-viewer').then(ok);
+    s.onerror = fail;
+    document.head.appendChild(s);
+  }));
   // ---------- 360° viewer: crossfades between the turntable frames ----------
   function makeViewer(media, photo) {
     const spin = media.querySelector('.spin');
+    const m3d = media.querySelector('.m3d');
+    let modelSrc = null;
     const tabs = media.querySelector('.view-tabs');
     const deg = spin.querySelector('.spin-deg');
     const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -1387,21 +1433,52 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const start = () => { if (!raf) { lastT = 0; raf = requestAnimationFrame(loop); } };
     const stop = () => { cancelAnimationFrame(raf); raf = 0; };
     function setView(v) {
-      const is360 = v === '360';
+      const is360 = v === '360', is3d = v === '3d';
       tabs.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v ? 'true' : 'false'));
       spin.hidden = !is360;
-      photo.hidden = is360;
+      m3d.hidden = !is3d;
+      photo.hidden = is360 || is3d;
       if (is360) start(); else stop();
+      if (is3d) show3d();
+    }
+    function show3d() {
+      const cur = m3d.querySelector('model-viewer');
+      if (cur && cur.getAttribute('src') === modelSrc) return;
+      if (cur) cur.remove();
+      m3d.querySelector('.m3d-load').hidden = false;
+      m3d.classList.remove('touched');
+      loadModelViewer().then(() => {
+        const mv = document.createElement('model-viewer');
+        mv.setAttribute('src', modelSrc);
+        mv.setAttribute('alt', `Modelo 3D: ${spin.getAttribute('data-label') || 'pieza'}`);
+        mv.setAttribute('camera-controls', '');
+        mv.setAttribute('auto-rotate', '');
+        mv.setAttribute('auto-rotate-delay', '0');
+        mv.setAttribute('rotation-per-second', '18deg');
+        mv.setAttribute('touch-action', 'pan-y');
+        mv.setAttribute('interaction-prompt', 'none');
+        mv.setAttribute('shadow-intensity', '1');
+        mv.setAttribute('camera-orbit', '0deg 75deg auto');
+        mv.setAttribute('min-camera-orbit', 'auto 20deg auto');
+        mv.setAttribute('max-camera-orbit', 'auto 100deg auto');
+        mv.addEventListener('load', () => { m3d.querySelector('.m3d-load').hidden = true; });
+        mv.addEventListener('pointerdown', () => m3d.classList.add('touched'));
+        m3d.insertBefore(mv, m3d.firstChild);
+      }).catch(() => { m3d.querySelector('.m3d-load').textContent = 'No se pudo cargar el 3D'; });
     }
     tabs.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
     return {
       // spin = { base: 'carpeta/', n: 8 } or null
-      load(spinData, label) {
+      load(spinData, label, model) {
         stop();
+        modelSrc = model || null;
+        spin.setAttribute('data-label', label);
+        tabs.querySelector('[data-v="360"]').hidden = !spinData;
+        tabs.querySelector('[data-v="3d"]').hidden = !model;
         frames.forEach((im) => im.remove());
         frames = []; n = 0; a = 0; vel = 0; tween = null; auto = true;
         spin.classList.remove('touched');
-        tabs.hidden = !spinData;
+        tabs.hidden = !spinData && !model;
         if (spinData) {
           n = spinData.n;
           for (let k = 0; k < n; k++) {
@@ -1434,7 +1511,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     lbCap.textContent = c.dataset.caption;
     document.getElementById('lbPrice').textContent = 'S/ ' + c.dataset.price;
     current = c;
-    viewer.load(c.dataset.spin ? { base: c.dataset.spin, n: Number(c.dataset.spinN) } : null, c.dataset.caption);
+    viewer.load(c.dataset.spin ? { base: c.dataset.spin, n: Number(c.dataset.spinN) } : null, c.dataset.caption, c.dataset.model);
     if (lb.showModal) lb.showModal(); else lb.setAttribute('open', '');
   }));
   const closeLb = () => (lb.close ? lb.close() : lb.removeAttribute('open'));
