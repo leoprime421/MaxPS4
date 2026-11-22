@@ -664,7 +664,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   overflow: hidden;
   background: radial-gradient(circle at 50% 40%, #fff, #f1ece5);
 }
-.m3d model-viewer { width: 100%; height: 100%; display: block; --poster-color: transparent; }
+.m3d canvas { width: 100% !important; height: 100% !important; display: block; touch-action: none; cursor: grab; }
 .m3d-hint {
   position: absolute;
   left: 50%;
@@ -1343,17 +1343,45 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   const sheetPhoto = document.getElementById('sheetPhoto');
 
 
-  // 3D model: the viewer library loads only the first time someone opens a 3D view
-  let mvLoading = null;
-  const loadModelViewer = () => mvLoading || (mvLoading = new Promise((ok, fail) => {
-    if (window.customElements && customElements.get('model-viewer')) return ok();
+  // 3D model: three.js loads only the first time someone opens a 3D view
+  let threeLoading = null;
+  const addScript = (src) => new Promise((ok, fail) => {
     const s = document.createElement('script');
-    s.type = 'module';
-    s.src = 'lib/model-viewer.min.js';
-    s.onload = () => customElements.whenDefined('model-viewer').then(ok);
-    s.onerror = fail;
+    s.src = src; s.onload = ok; s.onerror = fail;
     document.head.appendChild(s);
-  }));
+  });
+  const loadThree = () => threeLoading || (threeLoading = (async () => {
+    if (!window.THREE) await addScript('lib/three.min.js');
+    await addScript('lib/GLTFLoader.js');
+    await addScript('lib/OrbitControls.js');
+    await addScript('lib/RoomEnvironment.js');
+  })());
+  // The model ships as glTF JSON with its geometry embedded. We rebuild a binary glTF in memory so the
+  // loader never has to fetch a data: or blob: address, which the published page does not allow.
+  async function loadModel(src) {
+    const json = await fetch(src).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const raw = atob(json.buffers[0].uri.split(',')[1]);
+    let bin = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bin[i] = raw.charCodeAt(i);
+    delete json.buffers[0].uri;
+    let js = new TextEncoder().encode(JSON.stringify(json));
+    const pad = (a, v) => { const n = (4 - (a.length % 4)) % 4; if (!n) return a; const b = new Uint8Array(a.length + n).fill(v); b.set(a); return b; };
+    js = pad(js, 0x20); bin = pad(bin, 0);
+    const glb = new ArrayBuffer(12 + 8 + js.length + 8 + bin.length);
+    const dv = new DataView(glb);
+    dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, glb.byteLength, true);
+    dv.setUint32(12, js.length, true); dv.setUint32(16, 0x4E4F534A, true);
+    new Uint8Array(glb, 20, js.length).set(js);
+    const o = 20 + js.length;
+    dv.setUint32(o, bin.length, true); dv.setUint32(o + 4, 0x004E4942, true);
+    new Uint8Array(glb, o + 8, bin.length).set(bin);
+    return new Promise((ok, fail) => {
+      // load textures through <img> instead of fetch(), for the same reason
+      const cib = window.createImageBitmap;
+      try { window.createImageBitmap = undefined; new THREE.GLTFLoader().parse(glb, '', ok, fail); }
+      finally { window.createImageBitmap = cib; }
+    });
+  }
   // ---------- 360° viewer: crossfades between the turntable frames ----------
   function makeViewer(media, photo) {
     const spin = media.querySelector('.spin');
@@ -1427,32 +1455,75 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       m3d.hidden = !is3d;
       photo.hidden = is360 || is3d;
       if (is360) start(); else stop();
-      if (is3d) show3d();
+      if (is3d) show3d(); else stop3d();
+    }
+    let s3 = null;
+    function stop3d() { if (s3 && s3.raf) { cancelAnimationFrame(s3.raf); s3.raf = 0; } }
+    function run3d() {
+      if (!s3 || s3.raf) return;
+      const tick = () => { s3.controls.update(); s3.renderer.render(s3.scene, s3.camera); s3.raf = requestAnimationFrame(tick); };
+      s3.raf = requestAnimationFrame(tick);
     }
     function show3d() {
-      const cur = m3d.querySelector('model-viewer');
-      if (cur && cur.getAttribute('src') === modelSrc) return;
-      if (cur) cur.remove();
-      m3d.querySelector('.m3d-load').hidden = false;
+      if (s3 && s3.src === modelSrc) { run3d(); return; }
+      if (s3) { stop3d(); s3.renderer.dispose(); s3.renderer.domElement.remove(); s3 = null; }
+      const msg = m3d.querySelector('.m3d-load');
+      msg.hidden = false; msg.textContent = 'Cargando 3D…';
       m3d.classList.remove('touched');
-      loadModelViewer().then(() => {
-        const mv = document.createElement('model-viewer');
-        mv.setAttribute('src', modelSrc);
-        mv.setAttribute('alt', `Modelo 3D: ${spin.getAttribute('data-label') || 'pieza'}`);
-        mv.setAttribute('camera-controls', '');
-        mv.setAttribute('auto-rotate', '');
-        mv.setAttribute('auto-rotate-delay', '0');
-        mv.setAttribute('rotation-per-second', '18deg');
-        mv.setAttribute('touch-action', 'pan-y');
-        mv.setAttribute('interaction-prompt', 'none');
-        mv.setAttribute('shadow-intensity', '1');
-        mv.setAttribute('camera-orbit', '0deg 75deg auto');
-        mv.setAttribute('min-camera-orbit', 'auto 20deg auto');
-        mv.setAttribute('max-camera-orbit', 'auto 100deg auto');
-        mv.addEventListener('load', () => { m3d.querySelector('.m3d-load').hidden = true; });
-        mv.addEventListener('pointerdown', () => m3d.classList.add('touched'));
-        m3d.insertBefore(mv, m3d.firstChild);
-      }).catch(() => { m3d.querySelector('.m3d-load').textContent = 'No se pudo cargar el 3D'; });
+      const want = modelSrc;
+      const fail = () => { if (modelSrc === want) msg.textContent = 'No se pudo cargar el 3D'; };
+      const timer = setTimeout(fail, 30000);
+      loadThree().then(() => loadModel(want)).then((gltf) => {
+        clearTimeout(timer);
+        if (modelSrc !== want) return;
+        const T3 = THREE;
+        const w = m3d.clientWidth || 400, h = m3d.clientHeight || 400;
+        const renderer = new T3.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+        renderer.setSize(w, h);
+        renderer.outputEncoding = T3.sRGBEncoding;
+        renderer.toneMapping = T3.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.05;
+        m3d.insertBefore(renderer.domElement, m3d.firstChild);
+        const scene = new T3.Scene();
+        const pmrem = new T3.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new T3.RoomEnvironment(), .04).texture;
+        scene.add(new T3.HemisphereLight(0xfff4e6, 0x8a6a55, .5));
+        const sun = new T3.DirectionalLight(0xffffff, 1.1); sun.position.set(2, 4, 3); scene.add(sun);
+        const model = gltf.scene;
+        const box = new T3.Box3().setFromObject(model), size = box.getSize(new T3.Vector3()), center = box.getCenter(new T3.Vector3());
+        const k = 2 / Math.max(size.x, size.y, size.z);
+        model.scale.setScalar(k);
+        model.position.set(-center.x * k, -box.min.y * k, -center.z * k);
+        scene.add(model);
+        // soft contact shadow under the base
+        const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+        const g = cv.getContext('2d'), rg = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+        rg.addColorStop(0, 'rgba(60,35,20,.35)'); rg.addColorStop(1, 'rgba(60,35,20,0)');
+        g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+        const shadow = new T3.Mesh(new T3.PlaneGeometry(size.x * k * 1.5, size.z * k * 1.5),
+          new T3.MeshBasicMaterial({ map: new T3.CanvasTexture(cv), transparent: true, depthWrite: false }));
+        shadow.rotation.x = -Math.PI / 2; shadow.position.y = .002; scene.add(shadow);
+        const hgt = size.y * k;
+        const camera = new T3.PerspectiveCamera(32, w / h, .05, 50);
+        camera.position.set(0, hgt * .62, 4.6);
+        const controls = new T3.OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, hgt * .45, 0);
+        controls.enableDamping = true; controls.enablePan = false;
+        controls.autoRotate = !reduce; controls.autoRotateSpeed = 1.6;
+        controls.minDistance = 2.2; controls.maxDistance = 7;
+        controls.minPolarAngle = .35; controls.maxPolarAngle = 1.62;
+        controls.addEventListener('start', () => { m3d.classList.add('touched'); controls.autoRotate = false; });
+        const ro = new ResizeObserver(() => {
+          const W = m3d.clientWidth, H = m3d.clientHeight;
+          if (!W || !H) return;
+          renderer.setSize(W, H); camera.aspect = W / H; camera.updateProjectionMatrix();
+        });
+        ro.observe(m3d);
+        s3 = { src: want, renderer, scene, camera, controls, raf: 0, ro };
+        msg.hidden = true;
+        if (!m3d.hidden) run3d();
+      }).catch(() => { clearTimeout(timer); fail(); });
     }
     tabs.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.v)));
     return {
