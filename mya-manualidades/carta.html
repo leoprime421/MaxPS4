@@ -1555,7 +1555,8 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
           for (let k = 0; k < n; k++) {
             const im = new Image();
             im.className = 'fr';
-            im.src = `${spinData.base}${k}.webp`;
+            const fr = window.MYA_FRAMES && window.MYA_FRAMES[spinData.base];
+            im.src = fr ? fr[k] : `${spinData.base}${k}.webp`;
             im.alt = '';
             im.draggable = false;
             im.decoding = 'async';
