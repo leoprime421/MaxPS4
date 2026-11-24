@@ -900,6 +900,65 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 .placed-note { margin: 12px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--copper-dark); }
 .saved-flag { display: inline-block; margin-top: 8px; font-size: 11.5px; color: #2f6b4f; }
 
+
+/* ---------- payment methods ---------- */
+.pay { flex: 1; min-height: 0; overflow: auto; padding: 4px 18px 16px; }
+.pay-head { display: flex; align-items: center; gap: 8px; padding: 12px 0 10px; }
+.pay-head h3 { margin: 0; flex: 1; font: 500 11px/1 var(--font-label); letter-spacing: .24em; text-transform: uppercase; color: var(--copper-dark); }
+.pay-total { font: 600 20px/1 var(--font-display); color: var(--ink); white-space: nowrap; }
+.pay-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pay-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(110, 58, 34, .22);
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.pay-opt:hover { border-color: rgba(168, 98, 60, .6); }
+.pay-opt[aria-checked="true"] { border-color: var(--copper); box-shadow: 0 0 0 3px rgba(168, 98, 60, .18); }
+.pay-opt:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+.pay-opt b { display: block; font-size: 15px; }
+.pay-opt small { display: block; margin-top: 2px; font-size: 12px; color: var(--copper-dark); opacity: .85; }
+.pi {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font: 700 18px/1 var(--font-label);
+  font-style: normal;
+  color: #fff;
+}
+.pi svg { width: 24px; height: 24px; }
+.pi-yape { background: #742284; }
+.pi-plin { background: #00a5b5; }
+.pi-cash { background: #2f6b4f; }
+.pi-card { background: var(--copper-dark); }
+.pay-detail { margin-top: 14px; padding: 16px; border-radius: 12px; background: var(--paper); font-size: 14px; line-height: 1.55; }
+.pay-detail h4 { margin: 0 0 8px; font: 500 11px/1 var(--font-label); letter-spacing: .2em; text-transform: uppercase; color: var(--copper); }
+.pay-num { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 4px 0 6px; }
+.pay-num strong { font: 600 30px/1 var(--font-display); letter-spacing: .04em; color: var(--ink); user-select: all; font-variant-numeric: tabular-nums; }
+.pay-num .ghost-btn { padding: 9px 14px; font-size: 11px; }
+.pay-who { margin: 0; }
+.pay-who b { color: var(--copper-dark); }
+.pay-steps { margin: 12px 0 0; padding-left: 20px; }
+.pay-steps li { margin-top: 4px; }
+.pay-note { margin: 10px 0 0; font-size: 12.5px; color: var(--copper-dark); }
+.shop-foot button.buy-btn { font-family: var(--font-label); }
+@media (max-width: 640px) {
+  .pay { padding: 4px 12px 14px; }
+  .pay-opts { grid-template-columns: 1fr; }
+  .pay-opt { padding: 12px; }
+}
+
 /* ---------- login ---------- */
 dialog.login {
   border: 0;
@@ -1158,9 +1217,24 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <div class="placed" id="placed" hidden></div>
     </div>
   </div>
+  <section class="pay" id="pay" hidden aria-labelledby="payTitle">
+    <div class="pay-head">
+      <button class="side-back" id="payBack" type="button" aria-label="Volver al envío">‹</button>
+      <h3 id="payTitle">Elige cómo pagar</h3>
+      <span class="pay-total" id="payTotal"></span>
+    </div>
+    <div class="pay-opts" role="radiogroup" aria-labelledby="payTitle">
+      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="yape"><i class="pi pi-yape" aria-hidden="true">Y</i><span><b>Yape</b><small>Pagas al instante desde tu celular</small></span></button>
+      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="plin"><i class="pi pi-plin" aria-hidden="true">P</i><span><b>Plin</b><small>Desde la app de tu banco</small></span></button>
+      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="efectivo"><i class="pi pi-cash" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Pago en efectivo</b><small>Pagas cuando recibes tu pedido</small></span></button>
+      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta"><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
+    </div>
+    <div class="pay-detail" id="payDetail" aria-live="polite" hidden></div>
+  </section>
   <div class="shop-foot">
     <output id="summary" aria-live="polite"></output>
-    <a class="buy-btn" id="confirmBtn" href="#" target="_blank" rel="noopener" aria-disabled="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>Pedir por WhatsApp</a>
+    <button class="buy-btn" id="payBtn" type="button" disabled>Métodos de pago</button>
+    <a class="buy-btn" id="confirmBtn" href="#" target="_blank" rel="noopener" aria-disabled="true" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg><span id="confirmTxt">Enviar pedido por WhatsApp</span></a>
   </div>
 </dialog>
 
@@ -1201,9 +1275,10 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <div class="thanks-rows">
         <div><span>Precio</span><span id="tkPrice"></span></div>
         <div><span id="tkShipLabel"></span><span id="tkShip"></span></div>
+        <div><span>Pago</span><span id="tkPay"></span></div>
         <div class="tot"><span>Total</span><span id="tkTotal"></span></div>
       </div>
-      <div class="thanks-wa">Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b> o copia el pedido y envíalo.</div>
+      <div class="thanks-wa" id="tkNote">Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b> o copia el pedido y envíalo.</div>
       <div class="thanks-actions">
         <button class="ghost-btn" id="tkCopy" type="button">Copiar pedido</button>
         <a class="buy-btn" id="tkWa" href="#" target="_blank" rel="noopener">Abrir WhatsApp</a>
@@ -1792,16 +1867,98 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       m += `\nDatos de entrega:\n${addr.name}\n${addr.addr}${addr.ref ? ` (ref.: ${addr.ref})` : ''}\n${[addr.dist, addr.prov, addr.dep].join(', ')}\n`;
       if (addr.phone) m += `Cel.: ${addr.phone}\n`;
     }
+    if (payMethod) {
+      m += `\nPago: ${METODOS[payMethod].n}\n`;
+      if (payMethod === 'yape' || payMethod === 'plin') return m + `Ya hice el ${METODOS[payMethod].n} de S/ ${total()} a ${fmtNum(PAGOS[payMethod])}. Te envío la captura.`;
+      if (payMethod === 'efectivo') return m + `Pagaré en efectivo al recibir el pedido. ¿Llega la entrega contraentrega a mi zona?`;
+      return m + `Quiero pagar con tarjeta. ¿Me envías el link de pago?`;
+    }
     return m + `¿Cómo coordinamos el pago y la entrega?`;
   };
   function refresh() {
     const on = ready();
-    confirmBtn.setAttribute('aria-disabled', on ? 'false' : 'true');
-    confirmBtn.href = on ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg())}` : '#';
+    payBtn.disabled = !on;
+    if (!on && !payEl.hidden) hidePay();
+    const can = on && !!payMethod;
+    confirmBtn.setAttribute('aria-disabled', can ? 'false' : 'true');
+    confirmBtn.href = can ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg())}` : '#';
     if (!chosen) summary.textContent = 'Elige dónde lo enviamos para ver el envío y el total.';
     else summary.innerHTML = `S/ ${current.dataset.price} + envío S/ ${envio(chosen)} = <b class="total">Total S/ ${total()}</b>` +
       (on ? '' : auth.user ? ' · completa tu dirección' : ' · elige la provincia');
   }
+
+  // ---------- métodos de pago ----------
+  // Datos para Yape y Plin. TARJETA_LINK: pega aquí un link de pago (Mercado Pago, Izipay, Shopify…) cuando lo tengas.
+  const PAGOS = {
+    titular: 'Jesabeth Marianela Manrique Gutierrez',
+    yape: '984087172',
+    plin: '984087172',
+    TARJETA_LINK: '',
+  };
+  const METODOS = {
+    yape: { n: 'Yape', btn: 'Enviar comprobante' },
+    plin: { n: 'Plin', btn: 'Enviar comprobante' },
+    efectivo: { n: 'Pago en efectivo', btn: 'Confirmar pedido' },
+    tarjeta: { n: 'Tarjeta de crédito o débito', btn: 'Pedir link de pago' },
+  };
+  const fmtNum = (n) => n.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+  const payEl = document.getElementById('pay');
+  const payBtn = document.getElementById('payBtn');
+  const payDetail = document.getElementById('payDetail');
+  const confirmTxt = document.getElementById('confirmTxt');
+  const shopBody = shop.querySelector('.shop-body');
+  let payMethod = null;
+  function showPay() {
+    if (!ready()) return;
+    shopBody.hidden = true; payEl.hidden = false;
+    payBtn.hidden = true; confirmBtn.hidden = false;
+    document.getElementById('payTotal').textContent = `S/ ${total()}`;
+    refresh();
+    payEl.querySelector(payMethod ? `[data-m="${payMethod}"]` : '.pay-opt').focus({ preventScroll: true });
+  }
+  function hidePay() {
+    payEl.hidden = true; shopBody.hidden = false;
+    payBtn.hidden = false; confirmBtn.hidden = true;
+  }
+  function pickMethod(m) {
+    payMethod = m;
+    payEl.querySelectorAll('.pay-opt').forEach((b) => b.setAttribute('aria-checked', b.dataset.m === m ? 'true' : 'false'));
+    const t = `S/ ${total()}`;
+    let h = '';
+    if (m === 'yape' || m === 'plin') {
+      const num = PAGOS[m], app = METODOS[m].n;
+      h = `<h4>Paga con ${app}</h4>
+        <div class="pay-num"><strong>${fmtNum(num)}</strong><button class="ghost-btn" type="button" data-copy="${num}">Copiar número</button></div>
+        <p class="pay-who">A nombre de <b>${PAGOS.titular}</b></p>
+        <ol class="pay-steps"><li>Abre ${app} y paga <b>${t}</b> a este número.</li>
+        <li>Toma una captura del pago.</li>
+        <li>Toca <b>Enviar comprobante</b>: se abre WhatsApp y ahí adjuntas la captura.</li></ol>`;
+    } else if (m === 'efectivo') {
+      h = `<h4>Pago en efectivo</h4>
+        <p class="pay-who">Pagas <b>${t}</b> en efectivo cuando recibes tu pedido.</p>
+        <p class="pay-note">Te confirmamos por WhatsApp si la entrega con pago contraentrega llega a ${shipPlace()}. Si no llega, coordinamos otra forma de pago.</p>`;
+    } else if (m === 'tarjeta') {
+      h = `<h4>Tarjeta de crédito o débito</h4>` + (PAGOS.TARJETA_LINK
+        ? `<p class="pay-who">Paga <b>${t}</b> en nuestra página de pago seguro y luego confírmanos por WhatsApp.</p>
+           <p><a class="ghost-btn" href="${PAGOS.TARJETA_LINK}" target="_blank" rel="noopener">Ir a pagar con tarjeta</a></p>`
+        : `<p class="pay-who">Te enviamos por WhatsApp un link de pago seguro para pagar <b>${t}</b> con tu tarjeta.</p>`) +
+        `<p class="pay-note">Nunca te pediremos los números de tu tarjeta por chat.</p>`;
+    }
+    payDetail.innerHTML = h;
+    payDetail.hidden = false;
+    const cp = payDetail.querySelector('[data-copy]');
+    if (cp) cp.addEventListener('click', () => {
+      const done = () => { cp.textContent = 'Copiado'; setTimeout(() => (cp.textContent = 'Copiar número'), 1800); };
+      const sel = () => { const r = document.createRange(); r.selectNodeContents(payDetail.querySelector('.pay-num strong')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+      try { navigator.clipboard.writeText(cp.dataset.copy).then(done, sel); } catch (_) { sel(); }
+    });
+    confirmTxt.textContent = METODOS[m].btn;
+    refresh();
+    payDetail.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  }
+  payEl.querySelectorAll('.pay-opt').forEach((b) => b.addEventListener('click', () => pickMethod(b.dataset.m)));
+  payBtn.addEventListener('click', showPay);
+  document.getElementById('payBack').addEventListener('click', hidePay);
 
   // map
   const el = (tag, attrs, parent) => {
@@ -2069,6 +2226,10 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 
   async function openShop() {
     if (flying) flying.cancel();
+    payMethod = null; payDetail.hidden = true; payDetail.innerHTML = '';
+    payEl.querySelectorAll('.pay-opt').forEach((b) => b.setAttribute('aria-checked', 'false'));
+    confirmTxt.textContent = 'Enviar pedido por WhatsApp';
+    hidePay();
     chosen = prov = dist = addr = null; pinAt = null;
     Object.values(deps).forEach((o) => o.path.classList.remove('on'));
     gProv.innerHTML = '';
@@ -2130,6 +2291,11 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     document.getElementById('tkShipLabel').textContent = 'Envío a ' + shipPlace();
     document.getElementById('tkShip').textContent = 'S/ ' + envio(chosen);
     document.getElementById('tkTotal').textContent = 'S/ ' + total();
+    document.getElementById('tkPay').textContent = payMethod ? METODOS[payMethod].n : '';
+    const note = document.getElementById('tkNote');
+    if (payMethod === 'yape' || payMethod === 'plin') note.innerHTML = `Recuerda pagar <b>S/ ${total()}</b> por ${METODOS[payMethod].n} al <b>${fmtNum(PAGOS[payMethod])}</b> (${PAGOS.titular}) y enviar la captura al WhatsApp <b>994 970 194</b>.`;
+    else if (payMethod === 'tarjeta') note.innerHTML = 'Te enviaremos el link de pago con tarjeta por WhatsApp. Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b>.';
+    else note.innerHTML = 'Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b> o copia el pedido y envíalo.';
     document.getElementById('tkWa').href = confirmBtn.href;
     thanks.dataset.msg = orderMsg();
     thanks.hidden = false;
@@ -2154,7 +2320,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     try { navigator.clipboard.writeText(thanks.dataset.msg).then(ok, () => {}); } catch (_) { /* clipboard blocked */ }
   });
   confirmBtn.addEventListener('click', (e) => {
-    if (!chosen) { e.preventDefault(); return; }
+    if (!chosen || !payMethod) { e.preventDefault(); return; }
     const br = confirmBtn.getBoundingClientRect();
     if (typeof lastTap !== 'undefined') lastTap = { x: br.left + br.width / 2, y: br.top + br.height / 2 };
     // let the link open WhatsApp first, then close the map and open the green
