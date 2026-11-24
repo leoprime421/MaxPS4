@@ -900,7 +900,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 .pay-head { display: flex; align-items: center; gap: 8px; padding: 12px 0 10px; }
 .pay-head h3 { margin: 0; flex: 1; font: 500 11px/1 var(--font-label); letter-spacing: .24em; text-transform: uppercase; color: var(--copper-dark); }
 .pay-total { font: 600 20px/1 var(--font-display); color: var(--ink); white-space: nowrap; }
-.pay-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pay-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .pay-opt {
   display: flex;
   align-items: center;
@@ -934,7 +934,6 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 .pi svg { width: 24px; height: 24px; }
 .pi-yape { background: #742284; }
 .pi-plin { background: #00a5b5; }
-.pi-cash { background: #2f6b4f; }
 .pi-card { background: var(--copper-dark); }
 .pay-detail { margin-top: 14px; padding: 16px; border-radius: 12px; background: var(--paper); font-size: 14px; line-height: 1.55; }
 .pay-detail h4 { margin: 0 0 8px; font: 500 11px/1 var(--font-label); letter-spacing: .2em; text-transform: uppercase; color: var(--copper); }
@@ -1220,7 +1219,6 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <div class="pay-opts" role="radiogroup" aria-labelledby="payTitle">
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="yape"><i class="pi pi-yape" aria-hidden="true">Y</i><span><b>Yape</b><small>Pagas al instante desde tu celular</small></span></button>
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="plin"><i class="pi pi-plin" aria-hidden="true">P</i><span><b>Plin</b><small>Desde la app de tu banco</small></span></button>
-      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="efectivo"><i class="pi pi-cash" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Pago en efectivo</b><small>Pagas cuando recibes tu pedido</small></span></button>
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta"><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
     </div>
     <div class="pay-detail" id="payDetail" aria-live="polite" hidden></div>
@@ -1864,7 +1862,6 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     if (payMethod) {
       m += `\nPago: ${METODOS[payMethod].n}\n`;
       if (payMethod === 'yape' || payMethod === 'plin') return m + `Ya hice el ${METODOS[payMethod].n} de S/ ${total()} a ${fmtNum(PAGOS[payMethod])}. Te envío la captura.`;
-      if (payMethod === 'efectivo') return m + `Pagaré en efectivo al recibir el pedido. ¿Llega la entrega contraentrega a mi zona?`;
       return m + `Quiero pagar con tarjeta. ¿Me envías el link de pago?`;
     }
     return m + `¿Cómo coordinamos el pago y la entrega?`;
@@ -1892,7 +1889,6 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   const METODOS = {
     yape: { n: 'Yape', btn: 'Enviar comprobante' },
     plin: { n: 'Plin', btn: 'Enviar comprobante' },
-    efectivo: { n: 'Pago en efectivo', btn: 'Confirmar pedido' },
     tarjeta: { n: 'Tarjeta de crédito o débito', btn: 'Pedir link de pago' },
   };
   const fmtNum = (n) => n.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
@@ -1927,10 +1923,6 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
         <ol class="pay-steps"><li>Abre ${app} y paga <b>${t}</b> a este número.</li>
         <li>Toma una captura del pago.</li>
         <li>Toca <b>Enviar comprobante</b>: se abre WhatsApp y ahí adjuntas la captura.</li></ol>`;
-    } else if (m === 'efectivo') {
-      h = `<h4>Pago en efectivo</h4>
-        <p class="pay-who">Pagas <b>${t}</b> en efectivo cuando recibes tu pedido.</p>
-        <p class="pay-note">Te confirmamos por WhatsApp si la entrega con pago contraentrega llega a ${shipPlace()}. Si no llega, coordinamos otra forma de pago.</p>`;
     } else if (m === 'tarjeta') {
       h = `<h4>Tarjeta de crédito o débito</h4>` + (PAGOS.TARJETA_LINK
         ? `<p class="pay-who">Paga <b>${t}</b> en nuestra página de pago seguro y luego confírmanos por WhatsApp.</p>
