@@ -50,6 +50,7 @@ def convert(src, view_switch):
             '  window.MYA_LOGIN_URL = {{ routes.account_login_url | json }};\n'
             '  window.MYA_LOGOUT_URL = {{ routes.account_logout_url | json }};\n'
             '  window.MYA_ACCOUNT_URL = {{ routes.account_url | json }};\n'
+            '  window.MYA_STOREFRONT_LOGIN = {{ routes.storefront_login_url | json }};\n'
             '  window.MYA_CUSTOMER = {% if customer %}{ "id": {{ customer.id | json }}, "name": {{ customer.name | json }}, "email": {{ customer.email | json }} }{% else %}null{% endif %};\n'
             '  window.MYA_FRAMES = {\n__FRAMES__\n  };\n</script>\n').replace('__FRAMES__', frames)
     i = s.index('<title>')
