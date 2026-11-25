@@ -1153,6 +1153,55 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 .libro-done .msg { max-width: none; max-height: 220px; overflow: auto; }
 @media (max-width: 560px) { .lr-row { grid-template-columns: 1fr; } }
 
+/* ---------- terms consent ---------- */
+.consent {
+  position: fixed;
+  left: 50%;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 70;
+  width: min(calc(100% - 2 * max(16px, env(safe-area-inset-left, 0px))), 680px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 14px 40px rgba(40, 22, 14, .3);
+  border: 1px solid rgba(168, 98, 60, .3);
+  animation: consentIn .5s cubic-bezier(.2, .8, .2, 1);
+}
+.consent p { margin: 0; flex: 1; font-size: 13px; line-height: 1.5; }
+.consent .buy-btn { flex: none; }
+.consent-link { font: inherit; color: var(--copper-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; cursor: pointer; }
+.consent-link:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+@keyframes consentIn { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (max-width: 560px) { .consent { flex-direction: column; align-items: stretch; text-align: center; } }
+dialog.terms {
+  border: 0;
+  padding: 0;
+  width: min(94vw, 680px);
+  max-height: 90svh;
+  box-sizing: border-box;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 12px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .4);
+  overflow: auto;
+}
+dialog.terms[open] { animation: fade .25s ease; }
+dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur(3px); }
+.terms-in { padding: 22px 22px 20px; font-size: 14px; line-height: 1.6; }
+.terms-in h2 { margin: 0; padding-right: 40px; font: italic 500 30px/1.1 var(--font-display); color: var(--copper-dark); }
+.terms-in h3 { margin: 20px 0 6px; font: italic 500 22px/1.2 var(--font-display); color: var(--copper-dark); }
+.terms-in p { margin: 8px 0 0; max-width: 68ch; }
+.terms-date { font-size: 12px; color: var(--copper); }
+.terms-actions { position: sticky; bottom: -20px; margin: 16px -22px -20px; padding: 14px 22px; background: var(--card); border-top: 1px solid rgba(168, 98, 60, .2); display: flex; justify-content: flex-end; }
+.pay-terms { margin: 12px 0 0; font-size: 12px; color: var(--copper-dark); }
+.pay-terms .consent-link { font-weight: 600; }
+
 @media (prefers-reduced-motion: reduce) {
   .stage, .hint { transition: none; }
   .seal::before, .seal::after { animation: none; opacity: .5; }
@@ -1244,13 +1293,40 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 <footer class="legal" id="legal">
   <p class="legal-biz"><b>MYA Manualidades</b> · Jesabeth Marianela Manrique Gutierrez · RUC 10239845075 · Santa Monica A9, Cusco, Perú</p>
   <nav class="legal-links" aria-label="Información legal">
-    <a href="/policies/terms-of-service" data-shop-only>Términos y condiciones</a>
-    <a href="/policies/privacy-policy" data-shop-only>Privacidad</a>
+    <button type="button" class="consent-link" data-terms>Términos y condiciones</button>
+    <button type="button" class="consent-link" data-terms="priv">Privacidad</button>
     <a href="/policies/shipping-policy" data-shop-only>Envíos</a>
     <a href="/policies/refund-policy" data-shop-only>Cambios y devoluciones</a>
     <button type="button" class="libro-link" id="libroOpen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5v-16ZM4 20.5A1.5 1.5 0 0 0 5.5 22H20" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.6"/></svg>Libro de Reclamaciones</button>
   </nav>
 </footer>
+
+<div class="consent" id="consent" role="region" aria-label="Términos y condiciones" hidden>
+  <p>Al usar esta página y comprar en MYA Manualidades aceptas nuestros <button type="button" class="consent-link" data-terms>Términos y condiciones</button> y nuestra <button type="button" class="consent-link" data-terms="priv">Política de privacidad</button>.</p>
+  <button type="button" class="buy-btn" id="consentOk">Aceptar</button>
+</div>
+
+<dialog class="terms" id="terms" aria-labelledby="termsTitle">
+  <button class="shop-close" id="termsClose" type="button" aria-label="Cerrar">×</button>
+  <div class="terms-in">
+    <h2 id="termsTitle">Términos y condiciones</h2>
+    <p class="terms-date">Última actualización: 25 de noviembre de 2026</p>
+    <p><b>1. Quiénes somos.</b> MYA Manualidades es el nombre comercial de Jesabeth Marianela Manrique Gutierrez, RUC 10239845075, con domicilio en Santa Monica A9, Cusco, Perú. Contacto: WhatsApp 994 970 194 y correo palardojuan.125@gmail.com.</p>
+    <p><b>2. Productos.</b> Todas nuestras piezas son hechas a mano, por eso cada una puede tener pequeñas diferencias de color, forma o acabado frente a las fotos, sin que eso sea un defecto.</p>
+    <p><b>3. Precios.</b> Los precios están en soles (S/). El envío por Shalom lo pagas en la agencia al recoger tu pedido; las compras desde S/ 220 tienen envío gratis.</p>
+    <p><b>4. Pedidos.</b> El pedido queda confirmado cuando recibimos el pago completo. Si una pieza se agota, te avisamos y te devolvemos el dinero o te ofrecemos otra.</p>
+    <p><b>5. Pagos.</b> Aceptamos Yape, Plin y tarjeta de crédito o débito. Con Yape o Plin debes enviarnos la captura del pago por WhatsApp. Nunca te pediremos los números de tu tarjeta por chat ni por correo.</p>
+    <p><b>6. Comprobante de pago.</b> Emitimos boleta de venta electrónica por cada compra. Si la compra supera S/ 700, necesitamos tu nombre y DNI.</p>
+    <p><b>7. Envíos.</b> Preparamos tu pedido en 7 a 10 días hábiles y despachamos los lunes, jueves y viernes. Llega en 1 a 2 días hábiles a Cusco, 2 a 7 al resto del Perú y hasta 10 a zonas de selva o alejadas. Debes grabar un video sin cortes al abrir tu paquete; sin ese video no podemos atender reclamos por daños del transporte.</p>
+    <p><b>8. Cambios y devoluciones.</b> Si tu pieza llega dañada y nos envías el video de apertura en un máximo de 48 horas, te la reponemos gratis; si no podemos reponerla, te devolvemos el dinero en un máximo de 7 días hábiles. Aceptamos cambios dentro de los 7 días si la pieza está sin uso y en su empaque; esos envíos corren por tu cuenta.</p>
+    <p><b>9. Uso de la página.</b> Las fotos, el logo y los diseños de MYA Manualidades no se pueden copiar ni usar sin nuestro permiso.</p>
+    <p><b>10. Libro de Reclamaciones.</b> Está disponible en el botón "Libro de Reclamaciones" al pie de la página. Respondemos en un plazo máximo de 15 días hábiles.</p>
+    <p><b>11. Ley aplicable.</b> Estos términos se rigen por las leyes del Perú, incluido el Código de Protección y Defensa del Consumidor (Ley 29571).</p>
+    <h3 id="termsPriv">Política de privacidad</h3>
+    <p>Usamos tus datos (nombre, DNI, celular, dirección y correo) solo para atender tu pedido, emitir tu boleta y coordinar el envío. Los compartimos únicamente con la agencia de envíos, la pasarela de pago y SUNAT. No los vendemos. Puedes pedir acceder, corregir o eliminar tus datos (Ley 29733) escribiendo a palardojuan.125@gmail.com o al WhatsApp 994 970 194.</p>
+    <div class="terms-actions"><button type="button" class="buy-btn" id="termsOk">Aceptar y continuar</button></div>
+  </div>
+</dialog>
 
 <dialog class="libro" id="libro" aria-labelledby="libroTitle">
   <button class="shop-close" id="libroClose" type="button" aria-label="Cerrar">×</button>
@@ -1410,6 +1486,7 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta"><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
     </div>
     <div class="pay-detail" id="payDetail" aria-live="polite" hidden></div>
+    <p class="pay-terms">Al enviar tu pedido aceptas nuestros <button type="button" class="consent-link" data-terms>Términos y condiciones</button>.</p>
   </section>
   <div class="shop-foot">
     <output id="summary" aria-live="polite"></output>
@@ -2580,6 +2657,31 @@ Respuesta del proveedor: en un plazo máximo de 15 días hábiles.`;
     const ok = () => { lrCopy.textContent = 'Copiado'; setTimeout(() => (lrCopy.textContent = 'Copiar hoja'), 1800); };
     const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
     try { navigator.clipboard.writeText(t.textContent).then(ok, sel); } catch (_) { sel(); }
+  });
+
+  // ---------- terms consent on entry ----------
+  const TERMS_KEY = 'mya-terminos-2026-11-25';
+  const consent = document.getElementById('consent');
+  const termsDlg = document.getElementById('terms');
+  const accepted = () => { try { return !!localStorage.getItem(TERMS_KEY); } catch (_) { return false; } };
+  const accept = () => {
+    try { localStorage.setItem(TERMS_KEY, new Date().toISOString()); } catch (_) { /* storage blocked */ }
+    consent.hidden = true;
+    if (termsDlg.open) termsDlg.close();
+  };
+  function openTerms(section) {
+    termsDlg.showModal();
+    if (section === 'priv') document.getElementById('termsPriv').scrollIntoView();
+    else termsDlg.scrollTop = 0;
+  }
+  if (!accepted()) consent.hidden = false;
+  document.getElementById('consentOk').addEventListener('click', accept);
+  document.getElementById('termsOk').addEventListener('click', accept);
+  document.getElementById('termsClose').addEventListener('click', () => termsDlg.close());
+  termsDlg.addEventListener('click', (e) => { if (e.target === termsDlg) termsDlg.close(); });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-terms]');
+    if (t) { e.preventDefault(); openTerms(t.dataset.terms); }
   });
 
   mountAccount(document.getElementById('acctHost'));
