@@ -2021,7 +2021,8 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   const notReady = (name) => {
     loginErr.textContent = `El inicio con ${name} se está activando. Por ahora entra con tu correo: es igual de rápido.`;
   };
-  document.getElementById('gBtn').addEventListener('click', () => { if (!GOOGLE_CLIENT_ID) { if (window.MYA_SHOPIFY) notReady('Google'); else showDemo('google'); } });
+  // En Shopify, Google está activado en las cuentas de cliente: la página de inicio de Shopify muestra "Continuar con Google".
+  document.getElementById('gBtn').addEventListener('click', () => { if (!GOOGLE_CLIENT_ID) { if (window.MYA_SHOPIFY) shopLogin(); else showDemo('google'); } });
   // Correo: en Shopify abre el inicio de sesión de la tienda (te llega un código al correo).
   // Cuentas nuevas de Shopify: /customer_authentication/login vuelve a esta misma página (return_to relativo).
   const shopLogin = () => {
