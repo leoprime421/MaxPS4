@@ -1526,6 +1526,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta"><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
     </div>
     <div class="pay-detail" id="payDetail" aria-live="polite" hidden></div>
+    <p class="pay-terms" id="payShopNote" hidden>En el siguiente paso eliges cómo pagar (Yape, Plin o tarjeta) y confirmas tu pedido. Te llega la confirmación a tu correo y queda guardado en tu cuenta.</p>
     <p class="pay-terms">Al enviar tu pedido aceptas nuestros <button type="button" class="consent-link" data-terms>Términos y condiciones</button>.</p>
   </section>
   <div class="shop-foot">
@@ -1545,7 +1546,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <p class="login-new">¿Primera vez? <button type="button" class="consent-link" id="signupBtn">Crear cuenta</button>: escribe tu correo y te llega un código para entrar. Sin contraseñas.</p>
     <p class="login-new" id="acctAlt" hidden>¿No se abrió? <a class="consent-link" id="acctAltLink" href="#" target="_top">Entra a tu cuenta aquí</a>.</p>
     <div id="gSlot"><button class="sso google" id="gBtn" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continuar con Google</button></div>
-    <button class="sso apple" id="aBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.9-1.1-2.9-4.2zM13.9 5.1c.7-.9 1.2-2 1.1-3.1-1 0-2.3.7-3 1.5-.7.8-1.2 1.9-1.1 3 1.1.1 2.3-.6 3-1.4z"/></svg>Continuar con Apple</button>
+    <button class="sso apple" id="aBtn" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.9-1.1-2.9-4.2zM13.9 5.1c.7-.9 1.2-2 1.1-3.1-1 0-2.3.7-3 1.5-.7.8-1.2 1.9-1.1 3 1.1.1 2.3-.6 3-1.4z"/></svg>Continuar con Apple</button>
   </div>
   <form class="demo" id="demoForm" hidden>
     <p class="demo-note" id="demoNote"></p>
@@ -1600,12 +1601,12 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     { id: 'collares', nombre: 'Collares' },
   ];
   const PRODUCTOS = [
-    { cat: 'munecos', nombre: 'Nacimiento navideño', precio: 120, img: '{{ "mya-belen.webp" | asset_url }}',
+    { cat: 'munecos', nombre: 'Nacimiento navideño', precio: 120, img: '{{ "mya-belen.webp" | asset_url }}', variant: '68197647319193',
       spin: { base: 'img/jose-360/', n: 8 },
       model: '{{ "mya-modelo-3d.json" | asset_url }}',
       alt: 'Nacimiento con María, José y el Niño hechos a mano, con aureolas de filigrana dorada',
       desc: 'María, José y el Niño hechos a mano, con aureolas de filigrana dorada.' },
-    { cat: 'collares', nombre: 'Collar flor de cobre', precio: 35, img: '{{ "mya-collar.webp" | asset_url }}',
+    { cat: 'collares', nombre: 'Collar flor de cobre', precio: 35, img: '{{ "mya-collar.webp" | asset_url }}', variant: '68197647351961',
       alt: 'Collar con colgante de flor tejida en alambre de cobre y cristal negro al centro',
       desc: 'Flor tejida a mano en alambre de cobre, con un cristal negro al centro y cadena de cobre.' },
   ];
@@ -1917,7 +1918,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   const viewer = makeViewer(document.getElementById('sheetMedia'), sheetPhoto);
   let current = null;
   function openSheet(p, card) {
-    current = { dataset: { caption: p.nombre, price: String(p.precio), full: p.img } };
+    current = { dataset: { caption: p.nombre, price: String(p.precio), full: p.img, variant: p.variant || '' } };
     sheetPhoto.src = p.img;
     sheetPhoto.alt = p.alt;
     viewer.load(p.spin || null, p.nombre, p.model);
@@ -2183,13 +2184,44 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     }
     return m + `¿Cómo coordinamos el pago y la entrega?`;
   };
+
+  // ---------- checkout de Shopify: el pedido queda guardado en la tienda ----------
+  const PROV_CODE = { 'Amazonas': 'AMA', 'Áncash': 'ANC', 'Apurímac': 'APU', 'Arequipa': 'ARE', 'Ayacucho': 'AYA', 'Cajamarca': 'CAJ', 'Callao': 'CAL', 'Cusco': 'CUS', 'Huancavelica': 'HUV', 'Huánuco': 'HUC', 'Ica': 'ICA', 'Junín': 'JUN', 'La Libertad': 'LAL', 'Lambayeque': 'LAM', 'Lima': 'LIM', 'Loreto': 'LOR', 'Madre de Dios': 'MDD', 'Moquegua': 'MOQ', 'Pasco': 'PAS', 'Piura': 'PIU', 'Puno': 'PUN', 'San Martín': 'SAM', 'Tacna': 'TAC', 'Tumbes': 'TUM', 'Ucayali': 'UCA' };
+  const useShopCheckout = () => !!(window.MYA_SHOPIFY && current && current.dataset.variant);
+  function checkoutUrl() {
+    const q = new URLSearchParams();
+    const a = 'checkout[shipping_address]';
+    const name = (addr && addr.name) || (auth.user && auth.user.name) || '';
+    const parts = name.trim().split(/\s+/);
+    if (auth.user && auth.user.email) q.set('checkout[email]', auth.user.email);
+    q.set(`${a}[country]`, 'PE');
+    let code = PROV_CODE[chosen] || '';
+    if (chosen === 'Lima' && prov && prov.n === 'Lima') code = 'LMA';
+    if (code) q.set(`${a}[province]`, code);
+    q.set(`${a}[city]`, (prov && prov.n) || chosen || '');
+    q.set(`${a}[address1]`, (addr && addr.addr) || `Recojo en agencia Shalom de ${(prov && prov.n) || chosen}`);
+    if (dist) q.set(`${a}[address2]`, `Distrito: ${dist}`);
+    if (parts[0]) q.set(`${a}[first_name]`, parts[0]);
+    if (parts.length > 1) q.set(`${a}[last_name]`, parts.slice(1).join(' '));
+    if (addr && addr.phone) q.set(`${a}[phone]`, addr.phone);
+    q.set('note', `Envío por Shalom a ${shipPlace()} (el cliente paga el envío al recoger).${addr && addr.ref ? ` Referencia: ${addr.ref}.` : ''} El cliente aceptó grabar la apertura del paquete.`);
+    return `/cart/${current.dataset.variant}:1?${q.toString()}`;
+  }
   function refresh() {
     const on = ready();
     payBtn.disabled = !on;
     if (!on && !payEl.hidden) hidePay();
-    const can = on && !!payMethod && document.getElementById('unboxOk').checked;
+    const shopFlow = useShopCheckout();
+    const can = on && (shopFlow || !!payMethod) && document.getElementById('unboxOk').checked;
     confirmBtn.setAttribute('aria-disabled', can ? 'false' : 'true');
-    confirmBtn.href = can ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg())}` : '#';
+    confirmBtn.querySelector('svg').style.display = shopFlow ? 'none' : '';
+    if (shopFlow) {
+      confirmBtn.removeAttribute('target');
+      confirmBtn.href = can ? checkoutUrl() : '#';
+    } else {
+      confirmBtn.setAttribute('target', '_blank');
+      confirmBtn.href = can ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg())}` : '#';
+    }
     if (!chosen) summary.textContent = 'Elige dónde lo enviamos para ver el envío y el total.';
     else summary.innerHTML = `<b class="total">Total S/ ${total()}</b> · ${envioTxt()}` +
       (on ? '' : auth.user ? ' · completa tu dirección' : ' · elige la provincia');
@@ -2220,8 +2252,15 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     shopBody.hidden = true; payEl.hidden = false;
     payBtn.hidden = true; confirmBtn.hidden = false;
     document.getElementById('payTotal').textContent = `S/ ${total()}`;
+    const shopFlow = useShopCheckout();
+    payEl.querySelector('.pay-opts').hidden = shopFlow;
+    if (shopFlow) payDetail.hidden = true;
+    document.getElementById('payTitle').textContent = shopFlow ? 'Antes de pagar' : 'Elige cómo pagar';
+    document.getElementById('payShopNote').hidden = !shopFlow;
+    if (shopFlow) confirmTxt.textContent = 'Ir a pagar';
     refresh();
-    payEl.querySelector(payMethod ? `[data-m="${payMethod}"]` : '.pay-opt').focus({ preventScroll: true });
+    const first = shopFlow ? document.getElementById('unboxOk') : payEl.querySelector(payMethod ? `[data-m="${payMethod}"]` : '.pay-opt');
+    first.focus({ preventScroll: true });
   }
   function hidePay() {
     payEl.hidden = true; shopBody.hidden = false;
@@ -2626,6 +2665,10 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     try { navigator.clipboard.writeText(thanks.dataset.msg).then(ok, () => {}); } catch (_) { /* clipboard blocked */ }
   });
   confirmBtn.addEventListener('click', (e) => {
+    if (useShopCheckout()) {
+      if (!chosen || !document.getElementById('unboxOk').checked) e.preventDefault();
+      return;
+    }
     if (!chosen || !payMethod || !document.getElementById('unboxOk').checked) { e.preventDefault(); return; }
     const br = confirmBtn.getBoundingClientRect();
     if (typeof lastTap !== 'undefined') lastTap = { x: br.left + br.width / 2, y: br.top + br.height / 2 };
