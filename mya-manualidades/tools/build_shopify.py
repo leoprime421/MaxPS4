@@ -46,7 +46,7 @@ def convert(src, view_switch):
     frames = ',\n'.join(
         '    "%s": [%s]' % (base, ', '.join('"%s"' % url(ASSETS[f'{base}{k}.webp']) for k in range(n)))
         for base, n in SPINS.items())
-    head = '<script>\n  window.MYA_FRAMES = {\n%s\n  };\n</script>\n' % frames
+    head = '<script>\n  window.MYA_SHOPIFY = true;\n  window.MYA_FRAMES = {\n%s\n  };\n</script>\n' % frames
     i = s.index('<title>')
     s = s[:i] + head + s[i:]
     for old, new in view_switch:

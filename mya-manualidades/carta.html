@@ -1057,6 +1057,102 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   .addr, .placed { padding: 4px 12px 14px; }
 }
 
+/* ---------- unboxing warning ---------- */
+.unbox {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff4e5;
+  border: 2px solid #e08a2e;
+  color: #5a3210;
+}
+.unbox svg { flex: none; width: 30px; height: 30px; color: #c96a12; }
+.unbox strong { display: block; font-size: 15px; margin-bottom: 4px; color: #8a3f00; }
+.unbox p { margin: 0; font-size: 13.5px; line-height: 1.5; }
+.unbox label { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.unbox input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--copper); flex: none; }
+
+/* ---------- legal footer ---------- */
+footer.legal {
+  padding-block: 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  text-align: center;
+  color: var(--copper-dark);
+  border-top: 1px solid rgba(168, 98, 60, .2);
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.legal-biz { margin: 0 0 8px; }
+.legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; }
+.legal-links a, .libro-link {
+  color: var(--copper-dark);
+  font: 500 12px/1.4 var(--font-label);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: 0;
+  padding: 2px;
+  cursor: pointer;
+}
+.libro-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border: 1px solid rgba(110, 58, 34, .4); border-radius: 999px; padding: 6px 12px; }
+.libro-link svg { width: 16px; height: 16px; }
+.legal-links a:focus-visible, .libro-link:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+
+/* ---------- libro de reclamaciones ---------- */
+dialog.libro {
+  border: 0;
+  padding: 0;
+  width: min(94vw, 640px);
+  max-height: 94svh;
+  box-sizing: border-box;
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 12px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .4);
+  overflow: auto;
+}
+dialog.libro[open] { animation: fade .25s ease; }
+dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur(3px); }
+.libro-in { padding: 20px 20px 22px; }
+.libro-head { display: flex; gap: 12px; align-items: center; padding-right: 40px; }
+.libro-head svg { width: 36px; height: 36px; color: var(--copper); flex: none; }
+.libro-head h2 { margin: 0; font: italic 500 28px/1.1 var(--font-display); color: var(--copper-dark); }
+.libro-head p { margin: 4px 0 0; font-size: 12px; color: var(--copper-dark); font-variant-numeric: tabular-nums; }
+.libro-biz { margin: 12px 0 4px; padding: 10px 12px; border-radius: 8px; background: var(--paper); font-size: 12px; line-height: 1.5; }
+.libro fieldset { border: 0; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
+.libro legend { font: 600 11px/1 var(--font-label); letter-spacing: .2em; text-transform: uppercase; color: var(--copper); margin-bottom: 4px; }
+.libro label { font-size: 12.5px; color: var(--copper-dark); margin-top: 4px; }
+.libro input:not([type=checkbox]):not([type=radio]), .libro select, .libro textarea {
+  font: 400 15px/1.35 var(--font-label);
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid rgba(110, 58, 34, .3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.libro textarea { resize: vertical; }
+.libro input:focus, .libro select:focus, .libro textarea:focus { outline: 2px solid var(--copper); outline-offset: 0; border-color: transparent; }
+.lr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lr-row > div { display: grid; gap: 6px; min-width: 0; }
+.lr-radios { display: grid; gap: 6px; }
+.lr-radios label, .lr-check { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; color: var(--ink); cursor: pointer; }
+.lr-radios input, .lr-check input { margin-top: 2px; accent-color: var(--copper); flex: none; }
+.lr-check { margin-top: 14px; }
+.libro .buy-btn { margin-top: 8px; }
+.libro-note { margin: 12px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--copper-dark); }
+.libro-done h3 { margin: 18px 0 6px; font: italic 500 24px/1.2 var(--font-display); color: var(--copper-dark); }
+.libro-done p { font-size: 14px; line-height: 1.55; }
+.libro-done .msg { max-width: none; max-height: 220px; overflow: auto; }
+@media (max-width: 560px) { .lr-row { grid-template-columns: 1fr; } }
+
 @media (prefers-reduced-motion: reduce) {
   .stage, .hint { transition: none; }
   .seal::before, .seal::after { animation: none; opacity: .5; }
@@ -1145,6 +1241,90 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <button class="close-btn" id="closeBtn" type="button">Cerrar la carta</button>
   </div>
 </main>
+<footer class="legal" id="legal">
+  <p class="legal-biz"><b>MYA Manualidades</b> · Jesabeth Marianela Manrique Gutierrez · RUC 10239845075 · Santa Monica A9, Cusco, Perú</p>
+  <nav class="legal-links" aria-label="Información legal">
+    <a href="/policies/terms-of-service" data-shop-only>Términos y condiciones</a>
+    <a href="/policies/privacy-policy" data-shop-only>Privacidad</a>
+    <a href="/policies/shipping-policy" data-shop-only>Envíos</a>
+    <a href="/policies/refund-policy" data-shop-only>Cambios y devoluciones</a>
+    <button type="button" class="libro-link" id="libroOpen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5v-16ZM4 20.5A1.5 1.5 0 0 0 5.5 22H20" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.6"/></svg>Libro de Reclamaciones</button>
+  </nav>
+</footer>
+
+<dialog class="libro" id="libro" aria-labelledby="libroTitle">
+  <button class="shop-close" id="libroClose" type="button" aria-label="Cerrar">×</button>
+  <div class="libro-in">
+    <header class="libro-head">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v16H5.5A1.5 1.5 0 0 0 4 20.5v-16ZM4 20.5A1.5 1.5 0 0 0 5.5 22H20" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 7h8M8 11h6" stroke="currentColor" stroke-width="1.6"/></svg>
+      <div>
+        <h2 id="libroTitle">Libro de Reclamaciones</h2>
+        <p>Hoja de reclamación virtual · <span id="lrNum"></span> · <span id="lrDate"></span></p>
+      </div>
+    </header>
+    <p class="libro-biz">MANRIQUE GUTIERREZ JESABETH MARIANELA (MYA Manualidades) · RUC 10239845075 · Santa Monica A9, Cusco, Perú</p>
+    <form id="libroForm" novalidate>
+      <fieldset>
+        <legend>1. Tus datos</legend>
+        <label for="lrName">Nombres y apellidos</label>
+        <input id="lrName" autocomplete="name" required>
+        <div class="lr-row">
+          <div><label for="lrDocType">Documento</label>
+            <select id="lrDocType"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
+          <div><label for="lrDoc">Número</label><input id="lrDoc" inputmode="numeric" required></div>
+        </div>
+        <label for="lrAddr">Domicilio</label>
+        <input id="lrAddr" autocomplete="street-address" required>
+        <div class="lr-row">
+          <div><label for="lrPhone">Teléfono</label><input id="lrPhone" type="tel" autocomplete="tel" required></div>
+          <div><label for="lrMail">Correo</label><input id="lrMail" type="email" autocomplete="email" required></div>
+        </div>
+        <label class="lr-check"><input type="checkbox" id="lrMinor"> Soy menor de edad</label>
+        <div id="lrParentBox" hidden>
+          <label for="lrParent">Nombre del padre, madre o apoderado</label>
+          <input id="lrParent">
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>2. Lo que compraste</legend>
+        <div class="lr-radios" role="radiogroup" aria-label="Tipo">
+          <label><input type="radio" name="lrItem" value="Producto" checked> Producto</label>
+          <label><input type="radio" name="lrItem" value="Servicio"> Servicio</label>
+        </div>
+        <div class="lr-row">
+          <div><label for="lrOrder">Producto o número de pedido</label><input id="lrOrder" required></div>
+          <div><label for="lrAmount">Monto reclamado (S/)</label><input id="lrAmount" inputmode="decimal" placeholder="0.00"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>3. Tu reclamo</legend>
+        <div class="lr-radios" role="radiogroup" aria-label="Tipo de reclamo">
+          <label><input type="radio" name="lrType" value="Reclamo" checked> <b>Reclamo</b>: no estás conforme con el producto o servicio.</label>
+          <label><input type="radio" name="lrType" value="Queja"> <b>Queja</b>: no estás conforme con la atención recibida.</label>
+        </div>
+        <label for="lrDetail">Detalle</label>
+        <textarea id="lrDetail" rows="4" required></textarea>
+        <label for="lrAsk">¿Qué solicitas?</label>
+        <textarea id="lrAsk" rows="2" required></textarea>
+      </fieldset>
+      <label class="lr-check"><input type="checkbox" id="lrOk"> Acepto que MYA Manualidades use estos datos para atender mi reclamo.</label>
+      <p class="addr-err" id="lrErr" role="alert"></p>
+      <button class="buy-btn" type="submit">Enviar reclamo</button>
+      <p class="libro-note">Te responderemos en un plazo máximo de 15 días hábiles. Presentar un reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
+    </form>
+    <div class="libro-done" id="libroDone" hidden>
+      <h3>Tu reclamo está listo para enviar</h3>
+      <p>Se abrió tu correo con la hoja de reclamación, dirigida a <b>palardojuan.125@gmail.com</b> y con copia para ti. Solo falta tocar <b>Enviar</b>. Guarda este número: <b id="lrNumDone"></b>.</p>
+      <pre class="msg" id="lrText"></pre>
+      <div class="done-actions">
+        <a class="ghost-btn" id="lrMailto" href="#">Abrir mi correo otra vez</a>
+        <button class="ghost-btn" id="lrCopy" type="button">Copiar hoja</button>
+        <button class="buy-btn" id="lrBack" type="button">Listo</button>
+      </div>
+      <p class="libro-note">Si tu correo no se abrió, copia la hoja y envíala a palardojuan.125@gmail.com.</p>
+    </div>
+  </div>
+</dialog>
 
 <dialog class="lightbox" id="lightbox" aria-label="Foto ampliada">
   <figure class="media" id="lbMedia">
@@ -1215,6 +1395,14 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <button class="side-back" id="payBack" type="button" aria-label="Volver al envío">‹</button>
       <h3 id="payTitle">Elige cómo pagar</h3>
       <span class="pay-total" id="payTotal"></span>
+    </div>
+    <div class="unbox" role="note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5V8Z M3 8l9 5 9-5 M12 13v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <div>
+        <strong>Importante: graba un video al abrir tu paquete</strong>
+        <p>Graba sin cortes desde el paquete cerrado hasta sacar la pieza. Si llega dañada, con ese video te reponemos la pieza gratis. Sin video no podemos comprobar el daño y no podremos reponerla.</p>
+        <label><input type="checkbox" id="unboxOk"> Entiendo y grabaré la apertura de mi paquete</label>
+      </div>
     </div>
     <div class="pay-opts" role="radiogroup" aria-labelledby="payTitle">
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="yape"><i class="pi pi-yape" aria-hidden="true">Y</i><span><b>Yape</b><small>Pagas al instante desde tu celular</small></span></button>
@@ -1829,18 +2017,15 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   // Número de WhatsApp de MYA con código de país, solo dígitos.
   const WHATSAPP = '51994970194';
 
-  // Costo de envío desde Cusco, en soles, por departamento. Cambia estos montos por tus tarifas reales.
-  const ZONAS = [
-    { precio: 8,  deps: ['Cusco'] },
-    { precio: 12, deps: ['Apurímac', 'Arequipa', 'Ayacucho', 'Madre de Dios', 'Moquegua', 'Puno', 'Tacna'] },
-    { precio: 15, deps: ['Callao', 'Huancavelica', 'Ica', 'Junín', 'Lima'] },
-    { precio: 18, deps: ['Áncash', 'Cajamarca', 'Huánuco', 'La Libertad', 'Lambayeque', 'Pasco', 'Piura', 'San Martín', 'Tumbes'] },
-    { precio: 25, deps: ['Amazonas', 'Loreto', 'Ucayali'] },
-  ];
-  const ENVIO = {};
-  ZONAS.forEach((z) => z.deps.forEach((d) => { ENVIO[d] = z.precio; }));
-  const envio = (dep) => ENVIO[dep] ?? 18;
-  const total = () => Number(current.dataset.price) + envio(chosen);
+  // Envío por Shalom: el cliente lo paga en la agencia al recoger. Gratis desde ENVIO_GRATIS_DESDE (lo pagas tú).
+  const ENVIO_GRATIS_DESDE = 220;
+  const SELVA = ['Amazonas', 'Loreto', 'Ucayali', 'Madre de Dios'];
+  const ENTREGA = (dep) => dep === 'Cusco' ? '1 a 2 días hábiles' : SELVA.includes(dep) ? 'hasta 10 días hábiles' : '2 a 7 días hábiles';
+  const PREPARACION = '7 a 10 días hábiles';
+  const DESPACHO = 'lunes, jueves y viernes';
+  const gratis = () => Number(current.dataset.price) >= ENVIO_GRATIS_DESDE;
+  const envioTxt = () => gratis() ? 'envío gratis' : 'el envío se paga en Shalom al recoger';
+  const total = () => Number(current.dataset.price);
 
   let chosen = null, prov = null, dist = null, addr = null, step = 'dep', flying = null;
   let PROV = null;
@@ -1853,14 +2038,14 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   const orderMsg = () => {
     let m = `¡Hola MYA Manualidades! Quiero hacer un pedido:\n` +
       `• ${current.dataset.caption} — S/ ${current.dataset.price}\n` +
-      `• Envío a ${shipPlace()} — S/ ${envio(chosen)}\n` +
+      `• Envío por Shalom a ${shipPlace()} — ${gratis() ? 'gratis' : 'lo pago en Shalom al recoger'}\n` +
       `Total: S/ ${total()}\n`;
     if (addr) {
       m += `\nDatos de entrega:\n${addr.name}\n${addr.addr}${addr.ref ? ` (ref.: ${addr.ref})` : ''}\n${[addr.dist, addr.prov, addr.dep].join(', ')}\n`;
       if (addr.phone) m += `Cel.: ${addr.phone}\n`;
     }
     if (payMethod) {
-      m += `\nPago: ${METODOS[payMethod].n}\n`;
+      m += `\nPago: ${METODOS[payMethod].n}\nEntiendo que debo grabar la apertura del paquete.\n`;
       if (payMethod === 'yape' || payMethod === 'plin') return m + `Ya hice el ${METODOS[payMethod].n} de S/ ${total()} a ${fmtNum(PAGOS[payMethod])}. Te envío la captura.`;
       return m + `Quiero pagar con tarjeta. ¿Me envías el link de pago?`;
     }
@@ -1870,11 +2055,11 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const on = ready();
     payBtn.disabled = !on;
     if (!on && !payEl.hidden) hidePay();
-    const can = on && !!payMethod;
+    const can = on && !!payMethod && document.getElementById('unboxOk').checked;
     confirmBtn.setAttribute('aria-disabled', can ? 'false' : 'true');
     confirmBtn.href = can ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderMsg())}` : '#';
     if (!chosen) summary.textContent = 'Elige dónde lo enviamos para ver el envío y el total.';
-    else summary.innerHTML = `S/ ${current.dataset.price} + envío S/ ${envio(chosen)} = <b class="total">Total S/ ${total()}</b>` +
+    else summary.innerHTML = `<b class="total">Total S/ ${total()}</b> · ${envioTxt()}` +
       (on ? '' : auth.user ? ' · completa tu dirección' : ' · elige la provincia');
   }
 
@@ -1944,6 +2129,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   }
   payEl.querySelectorAll('.pay-opt').forEach((b) => b.addEventListener('click', () => pickMethod(b.dataset.m)));
   payBtn.addEventListener('click', showPay);
+  document.getElementById('unboxOk').addEventListener('change', refresh);
   document.getElementById('payBack').addEventListener('click', hidePay);
 
   // map
@@ -1966,7 +2152,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   };
   peru.deps.forEach((d) => {
     const path = el('path', { d: d.d, class: 'dep', tabindex: '0', role: 'button', 'aria-label': d.n }, gDeps);
-    el('title', {}, path).textContent = `${d.n} · envío S/ ${envio(d.n)}`;
+    el('title', {}, path).textContent = `${d.n} · llega en ${ENTREGA(d.n)}`;
     clickable(path, () => chooseDep(d.n));
     deps[d.n] = { ...d, path };
   });
@@ -2076,7 +2262,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   function showDeps() {
     step = 'dep';
     setHead('Departamentos', null);
-    listOf(peru.deps, chosen, (d) => chooseDep(d.n), (d) => `Envío S/ ${envio(d.n)}`);
+    listOf(peru.deps, chosen, (d) => chooseDep(d.n), (d) => `Llega en ${ENTREGA(d.n)}`);
   }
   async function chooseDep(name, opts = {}) {
     const d = deps[name];
@@ -2091,7 +2277,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const provs = await loadProvs();
     drawProvs(provs ? provs[name] || [] : []);
     await zoomTo(d.b);
-    if (!opts.quiet) fly({ c: d.c, label: `${name} · S/ ${envio(name)}` });
+    if (!opts.quiet) fly({ c: d.c, label: name });
     if (provs && provs[name]) showProvs(); else showPlaced();
   }
   function drawProvs(arr) {
@@ -2161,11 +2347,12 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     if (auth.user && addr) {
       placed.innerHTML = `<div class="placed-card"><h4>Enviamos a</h4><strong>${addr.name}</strong>
         <p>${addr.addr}${addr.ref ? `<br>Ref.: ${addr.ref}` : ''}<br>${shipPlace()}${addr.phone ? `<br>Cel.: ${addr.phone}` : ''}</p>
+        <p>Envío por Shalom: ${envioTxt()}. Llega en ${ENTREGA(chosen)} después del despacho.</p>
         ${justSaved ? '<span class="saved-flag">✓ Dirección guardada en tu cuenta</span>' : ''}
         <div class="placed-actions"><button class="ghost-btn" type="button" data-a="edit">Editar datos</button><button class="ghost-btn" type="button" data-a="other">Otra dirección</button></div></div>`;
     } else {
       placed.innerHTML = `<div class="placed-card"><h4>Envío a</h4><strong>${shipPlace()}</strong>
-        <p>Envío S/ ${envio(chosen)}. La dirección exacta la coordinamos por WhatsApp.</p>
+        <p>Recoges en la agencia Shalom de tu ciudad; ${envioTxt()}. Llega en ${ENTREGA(chosen)} después del despacho.</p>
         <div class="placed-actions"><button class="ghost-btn" type="button" data-a="other">Cambiar</button></div></div>
         <p class="placed-note">¿Quieres guardar tu dirección completa? <button class="ghost-btn" type="button" data-a="login">Iniciar sesión</button></p>`;
     }
@@ -2213,6 +2400,7 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   async function openShop() {
     if (flying) flying.cancel();
     payMethod = null; payDetail.hidden = true; payDetail.innerHTML = '';
+    document.getElementById('unboxOk').checked = false;
     payEl.querySelectorAll('.pay-opt').forEach((b) => b.setAttribute('aria-checked', 'false'));
     confirmTxt.textContent = 'Enviar pedido por WhatsApp';
     hidePay();
@@ -2274,14 +2462,15 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     document.getElementById('tkImg').src = current.dataset.full;
     document.getElementById('tkName').textContent = current.dataset.caption;
     document.getElementById('tkPrice').textContent = 'S/ ' + current.dataset.price;
-    document.getElementById('tkShipLabel').textContent = 'Envío a ' + shipPlace();
-    document.getElementById('tkShip').textContent = 'S/ ' + envio(chosen);
+    document.getElementById('tkShipLabel').textContent = 'Envío por Shalom a ' + shipPlace();
+    document.getElementById('tkShip').textContent = gratis() ? 'Gratis' : 'Se paga en Shalom';
     document.getElementById('tkTotal').textContent = 'S/ ' + total();
     document.getElementById('tkPay').textContent = payMethod ? METODOS[payMethod].n : '';
     const note = document.getElementById('tkNote');
     if (payMethod === 'yape' || payMethod === 'plin') note.innerHTML = `Recuerda pagar <b>S/ ${total()}</b> por ${METODOS[payMethod].n} al <b>${fmtNum(PAGOS[payMethod])}</b> (${PAGOS.titular}) y enviar la captura al WhatsApp <b>994 970 194</b>.`;
     else if (payMethod === 'tarjeta') note.innerHTML = 'Te enviaremos el link de pago con tarjeta por WhatsApp. Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b>.';
     else note.innerHTML = 'Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b> o copia el pedido y envíalo.';
+    note.innerHTML += ` Preparamos tu pedido en ${PREPARACION} y despachamos los ${DESPACHO}. <b>Recuerda grabar la apertura del paquete.</b>`;
     document.getElementById('tkWa').href = confirmBtn.href;
     thanks.dataset.msg = orderMsg();
     thanks.hidden = false;
@@ -2306,12 +2495,93 @@ dialog.login::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     try { navigator.clipboard.writeText(thanks.dataset.msg).then(ok, () => {}); } catch (_) { /* clipboard blocked */ }
   });
   confirmBtn.addEventListener('click', (e) => {
-    if (!chosen || !payMethod) { e.preventDefault(); return; }
+    if (!chosen || !payMethod || !document.getElementById('unboxOk').checked) { e.preventDefault(); return; }
     const br = confirmBtn.getBoundingClientRect();
     if (typeof lastTap !== 'undefined') lastTap = { x: br.left + br.width / 2, y: br.top + br.height / 2 };
     // let the link open WhatsApp first, then close the map and open the green
     setTimeout(() => { closeShop(); showThanks(thanksOrigin()); }, 60);
   });
+  // ---------- libro de reclamaciones ----------
+  const LIBRO_CORREO = 'palardojuan.125@gmail.com';
+  const isShopify = !!window.MYA_SHOPIFY;
+  document.querySelectorAll('[data-shop-only]').forEach((a) => { a.hidden = !isShopify; });
+  const libro = document.getElementById('libro');
+  const libroForm = document.getElementById('libroForm');
+  const libroDone = document.getElementById('libroDone');
+  let lrNum = '', lrDate = '';
+  const pad2 = (n) => String(n).padStart(2, '0');
+  function openLibro() {
+    const d = new Date();
+    lrNum = `LR-${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}-${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
+    lrDate = d.toLocaleString('es-PE', { dateStyle: 'long', timeStyle: 'short' });
+    document.getElementById('lrNum').textContent = `N.° ${lrNum}`;
+    document.getElementById('lrDate').textContent = lrDate;
+    libroForm.hidden = false; libroDone.hidden = true;
+    document.getElementById('lrErr').textContent = '';
+    libro.showModal();
+    libro.scrollTop = 0;
+  }
+  document.getElementById('libroOpen').addEventListener('click', openLibro);
+  document.getElementById('libroClose').addEventListener('click', () => libro.close());
+  document.getElementById('lrBack').addEventListener('click', () => libro.close());
+  libro.addEventListener('click', (e) => { if (e.target === libro) libro.close(); });
+  document.getElementById('lrMinor').addEventListener('change', (e) => { document.getElementById('lrParentBox').hidden = !e.target.checked; });
+  libroForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = (id) => document.getElementById(id).value.trim();
+    const err = document.getElementById('lrErr');
+    const need = [['lrName', 'tu nombre'], ['lrDoc', 'tu número de documento'], ['lrAddr', 'tu domicilio'], ['lrPhone', 'tu teléfono'], ['lrMail', 'tu correo'], ['lrOrder', 'el producto o pedido'], ['lrDetail', 'el detalle'], ['lrAsk', 'lo que solicitas']];
+    for (const [id, what] of need) {
+      if (!v(id)) { err.textContent = `Falta ${what}.`; document.getElementById(id).focus(); return; }
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('lrMail'))) { err.textContent = 'Revisa tu correo, parece incompleto.'; document.getElementById('lrMail').focus(); return; }
+    if (document.getElementById('lrMinor').checked && !v('lrParent')) { err.textContent = 'Falta el nombre del padre, madre o apoderado.'; document.getElementById('lrParent').focus(); return; }
+    if (!document.getElementById('lrOk').checked) { err.textContent = 'Marca la casilla para que podamos usar tus datos y atender tu reclamo.'; return; }
+    const type = libroForm.querySelector('[name=lrType]:checked').value;
+    const item = libroForm.querySelector('[name=lrItem]:checked').value;
+    const text =
+`LIBRO DE RECLAMACIONES — HOJA DE RECLAMACIÓN VIRTUAL
+N.° ${lrNum}
+Fecha: ${lrDate}
+
+PROVEEDOR
+MANRIQUE GUTIERREZ JESABETH MARIANELA (MYA Manualidades)
+RUC 10239845075 — Santa Monica A9, Cusco, Perú
+
+1. CONSUMIDOR
+Nombre: ${v('lrName')}
+${document.getElementById('lrDocType').value}: ${v('lrDoc')}
+Domicilio: ${v('lrAddr')}
+Teléfono: ${v('lrPhone')}
+Correo: ${v('lrMail')}${document.getElementById('lrMinor').checked ? `\nMenor de edad. Padre, madre o apoderado: ${v('lrParent')}` : ''}
+
+2. BIEN CONTRATADO
+Tipo: ${item}
+Producto o pedido: ${v('lrOrder')}
+Monto reclamado: ${v('lrAmount') ? 'S/ ' + v('lrAmount') : '—'}
+
+3. DETALLE
+Tipo: ${type}
+Detalle: ${v('lrDetail')}
+Pedido del consumidor: ${v('lrAsk')}
+
+Respuesta del proveedor: en un plazo máximo de 15 días hábiles.`;
+    const href = `mailto:${LIBRO_CORREO}?cc=${encodeURIComponent(v('lrMail'))}&subject=${encodeURIComponent(`${type} ${lrNum} — Libro de Reclamaciones MYA`)}&body=${encodeURIComponent(text)}`;
+    document.getElementById('lrText').textContent = text;
+    document.getElementById('lrNumDone').textContent = lrNum;
+    document.getElementById('lrMailto').href = href;
+    libroForm.hidden = true; libroDone.hidden = false;
+    libro.scrollTop = 0;
+    location.href = href;
+  });
+  const lrCopy = document.getElementById('lrCopy');
+  lrCopy.addEventListener('click', () => {
+    const t = document.getElementById('lrText');
+    const ok = () => { lrCopy.textContent = 'Copiado'; setTimeout(() => (lrCopy.textContent = 'Copiar hoja'), 1800); };
+    const sel = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText(t.textContent).then(ok, sel); } catch (_) { sel(); }
+  });
+
   mountAccount(document.getElementById('acctHost'));
 })();
 </script>
