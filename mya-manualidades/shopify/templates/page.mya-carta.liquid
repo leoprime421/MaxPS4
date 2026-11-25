@@ -913,7 +913,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
 .pay-head { display: flex; align-items: center; gap: 8px; padding: 12px 0 10px; }
 .pay-head h3 { margin: 0; flex: 1; font: 500 11px/1 var(--font-label); letter-spacing: .24em; text-transform: uppercase; color: var(--copper-dark); }
 .pay-total { font: 600 20px/1 var(--font-display); color: var(--ink); white-space: nowrap; }
-.pay-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.pay-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .pay-opt {
   display: flex;
   align-items: center;
@@ -1331,7 +1331,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <p><b>2. Productos.</b> Todas nuestras piezas son hechas a mano, por eso cada una puede tener pequeñas diferencias de color, forma o acabado frente a las fotos, sin que eso sea un defecto.</p>
     <p><b>3. Precios.</b> Los precios están en soles (S/). El envío por Shalom lo pagas en la agencia al recoger tu pedido; las compras desde S/ 220 tienen envío gratis.</p>
     <p><b>4. Pedidos.</b> El pedido queda confirmado cuando recibimos el pago completo. Si una pieza se agota, te avisamos y te devolvemos el dinero o te ofrecemos otra.</p>
-    <p><b>5. Pagos.</b> Aceptamos Yape, Plin y tarjeta de crédito o débito. Con Yape o Plin debes enviarnos la captura del pago por WhatsApp. Nunca te pediremos los números de tu tarjeta por chat ni por correo.</p>
+    <p><b>5. Pagos.</b> Por ahora aceptamos Yape y Plin. Con Yape o Plin debes enviarnos la captura del pago por WhatsApp. Nunca te pediremos los números de tu tarjeta por chat ni por correo.</p>
     <p><b>6. Comprobante de pago.</b> Emitimos boleta de venta electrónica por cada compra. Si la compra supera S/ 700, necesitamos tu nombre y DNI.</p>
     <p><b>7. Envíos.</b> No hacemos entregas a domicilio: enviamos por Shalom y recoges tu pedido en la agencia de tu ciudad con tu DNI. Preparamos tu pedido en 7 a 10 días hábiles y despachamos los lunes, jueves y viernes. Llega en 1 a 2 días hábiles a Cusco, 2 a 7 al resto del Perú y hasta 10 a zonas de selva o alejadas. Debes grabar un video sin cortes al abrir tu paquete; sin ese video no podemos atender reclamos por daños del transporte.</p>
     <p><b>8. Cambios y devoluciones.</b> Si tu pieza llega dañada y nos envías el video de apertura en un máximo de 48 horas, te la reponemos gratis; si no podemos reponerla, te devolvemos el dinero en un máximo de 7 días hábiles. Aceptamos cambios dentro de los 7 días si la pieza está sin uso y en su empaque; esos envíos corren por tu cuenta.</p>
@@ -1500,7 +1500,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <div class="pay-opts" role="radiogroup" aria-labelledby="payTitle">
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="yape"><i class="pi pi-yape" aria-hidden="true">Y</i><span><b>Yape</b><small>Pagas al instante desde tu celular</small></span></button>
       <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="plin"><i class="pi pi-plin" aria-hidden="true">P</i><span><b>Plin</b><small>Desde la app de tu banco</small></span></button>
-      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta"><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
+      <button class="pay-opt" type="button" role="radio" aria-checked="false" data-m="tarjeta" hidden><i class="pi pi-card" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="1.6"/></svg></i><span><b>Tarjeta de crédito o débito</b><small>Visa, Mastercard y otras</small></span></button>
     </div>
     <div class="pay-detail" id="payDetail" aria-live="polite" hidden></div>
     <p class="pay-terms" id="payShopNote" hidden>En el siguiente paso eliges cómo pagar (Yape, Plin o tarjeta) y confirmas tu pedido. Te llega la confirmación a tu correo y queda guardado en tu cuenta.</p>
@@ -2180,7 +2180,9 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 
   // ---------- checkout de Shopify: el pedido queda guardado en la tienda ----------
   const PROV_CODE = { 'Amazonas': 'AMA', 'Áncash': 'ANC', 'Apurímac': 'APU', 'Arequipa': 'ARE', 'Ayacucho': 'AYA', 'Cajamarca': 'CAJ', 'Callao': 'CAL', 'Cusco': 'CUS', 'Huancavelica': 'HUV', 'Huánuco': 'HUC', 'Ica': 'ICA', 'Junín': 'JUN', 'La Libertad': 'LAL', 'Lambayeque': 'LAM', 'Lima': 'LIM', 'Loreto': 'LOR', 'Madre de Dios': 'MDD', 'Moquegua': 'MOQ', 'Pasco': 'PAS', 'Piura': 'PIU', 'Puno': 'PUN', 'San Martín': 'SAM', 'Tacna': 'TAC', 'Tumbes': 'TUM', 'Ucayali': 'UCA' };
-  const useShopCheckout = () => !!(window.MYA_SHOPIFY && current && current.dataset.variant);
+  // Por ahora los pedidos van por WhatsApp (Yape o Plin). Pon USAR_CHECKOUT_SHOPIFY = true para volver al checkout de Shopify.
+  const USAR_CHECKOUT_SHOPIFY = false;
+  const useShopCheckout = () => !!(USAR_CHECKOUT_SHOPIFY && window.MYA_SHOPIFY && current && current.dataset.variant);
   function checkoutUrl() {
     const q = new URLSearchParams();
     const a = 'checkout[shipping_address]';
