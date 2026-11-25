@@ -46,7 +46,12 @@ def convert(src, view_switch):
     frames = ',\n'.join(
         '    "%s": [%s]' % (base, ', '.join('"%s"' % url(ASSETS[f'{base}{k}.webp']) for k in range(n)))
         for base, n in SPINS.items())
-    head = '<script>\n  window.MYA_SHOPIFY = true;\n  window.MYA_FRAMES = {\n%s\n  };\n</script>\n' % frames
+    head = ('<script>\n  window.MYA_SHOPIFY = true;\n'
+            '  window.MYA_LOGIN_URL = {{ routes.account_login_url | json }};\n'
+            '  window.MYA_LOGOUT_URL = {{ routes.account_logout_url | json }};\n'
+            '  window.MYA_ACCOUNT_URL = {{ routes.account_url | json }};\n'
+            '  window.MYA_CUSTOMER = {% if customer %}{ "id": {{ customer.id | json }}, "name": {{ customer.name | json }}, "email": {{ customer.email | json }} }{% else %}null{% endif %};\n'
+            '  window.MYA_FRAMES = {\n__FRAMES__\n  };\n</script>\n').replace('__FRAMES__', frames)
     i = s.index('<title>')
     s = s[:i] + head + s[i:]
     for old, new in view_switch:
