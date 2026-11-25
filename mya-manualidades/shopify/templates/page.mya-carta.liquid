@@ -2172,7 +2172,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     }
     if (payMethod) {
       m += `\nPago: ${METODOS[payMethod].n}\nEntiendo que debo grabar la apertura del paquete.\n`;
-      if (payMethod === 'yape' || payMethod === 'plin') return m + `Ya hice el ${METODOS[payMethod].n} de S/ ${total()} a ${fmtNum(PAGOS[payMethod])}. Te envío la captura.`;
+      if (payMethod === 'yape' || payMethod === 'plin') return m + `Quiero pagar con ${METODOS[payMethod].n}. ¿Me pasas el número para pagar S/ ${total()}?`;
       return m + `Quiero pagar con tarjeta. ¿Me envías el link de pago?`;
     }
     return m + `¿Cómo coordinamos el pago y la entrega?`;
@@ -2230,8 +2230,8 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     TARJETA_LINK: '',
   };
   const METODOS = {
-    yape: { n: 'Yape', btn: 'Enviar comprobante' },
-    plin: { n: 'Plin', btn: 'Enviar comprobante' },
+    yape: { n: 'Yape', btn: 'Pedir por WhatsApp' },
+    plin: { n: 'Plin', btn: 'Pedir por WhatsApp' },
     tarjeta: { n: 'Tarjeta de crédito o débito', btn: 'Pedir link de pago' },
   };
   const fmtNum = (n) => n.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
@@ -2266,13 +2266,12 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const t = `S/ ${total()}`;
     let h = '';
     if (m === 'yape' || m === 'plin') {
-      const num = PAGOS[m], app = METODOS[m].n;
-      h = `<h4>Paga con ${app}</h4>
-        <div class="pay-num"><strong>${fmtNum(num)}</strong><button class="ghost-btn" type="button" data-copy="${num}">Copiar número</button></div>
-        <p class="pay-who">A nombre de <b>${PAGOS.titular}</b></p>
-        <ol class="pay-steps"><li>Abre ${app} y paga <b>${t}</b> a este número.</li>
-        <li>Toma una captura del pago.</li>
-        <li>Toca <b>Enviar comprobante</b>: se abre WhatsApp y ahí adjuntas la captura.</li></ol>`;
+      const app = METODOS[m].n;
+      h = `<h4>Pagas con ${app} por WhatsApp</h4>
+        <p class="pay-who">Total a pagar: <b>${t}</b>. El número de ${app} te lo enviamos por WhatsApp al confirmar tu pedido.</p>
+        <ol class="pay-steps"><li>Toca <b>Pedir por WhatsApp</b>: nos llega tu pedido al 994 970 194.</li>
+        <li>Te respondemos con el número de ${app} y confirmamos tu pedido.</li>
+        <li>Pagas y nos mandas la captura por el mismo chat.</li></ol>`;
     } else if (m === 'tarjeta') {
       h = `<h4>Tarjeta de crédito o débito</h4>` + (PAGOS.TARJETA_LINK
         ? `<p class="pay-who">Paga <b>${t}</b> en nuestra página de pago seguro y luego confírmanos por WhatsApp.</p>
@@ -2633,7 +2632,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     document.getElementById('tkTotal').textContent = 'S/ ' + total();
     document.getElementById('tkPay').textContent = payMethod ? METODOS[payMethod].n : '';
     const note = document.getElementById('tkNote');
-    if (payMethod === 'yape' || payMethod === 'plin') note.innerHTML = `Recuerda pagar <b>S/ ${total()}</b> por ${METODOS[payMethod].n} al <b>${fmtNum(PAGOS[payMethod])}</b> (${PAGOS.titular}) y enviar la captura al WhatsApp <b>994 970 194</b>.`;
+    if (payMethod === 'yape' || payMethod === 'plin') note.innerHTML = `Te responderemos por WhatsApp con el número de ${METODOS[payMethod].n} para pagar <b>S/ ${total()}</b>. Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b>.`;
     else if (payMethod === 'tarjeta') note.innerHTML = 'Te enviaremos el link de pago con tarjeta por WhatsApp. Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b>.';
     else note.innerHTML = 'Si WhatsApp no se abrió, escríbenos al <b>994 970 194</b> o copia el pedido y envíalo.';
     note.innerHTML += ` Preparamos tu pedido en ${PREPARACION} y despachamos los ${DESPACHO}. <b>Recuerda grabar la apertura del paquete.</b>`;
