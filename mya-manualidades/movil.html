@@ -945,6 +945,7 @@ dialog.shop::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blur
   box-sizing: border-box;
 }
 .addr input:focus, .demo input:focus { outline: 2px solid var(--copper); outline-offset: 0; border-color: transparent; }
+.pickup-note { margin: 0 0 4px; padding: 10px 12px; border-radius: 8px; background: #fff4e5; border: 1px solid #e8b27a; font-size: 13px; line-height: 1.45; color: #5a3210; }
 .addr-where { margin: 0 0 4px; font: italic 500 19px/1.25 var(--font-display); color: var(--copper-dark); }
 .addr-err, .login-err { margin: 2px 0 0; min-height: 1em; font-size: 12.5px; color: #a33a1c; }
 .addr .buy-btn { margin-top: 6px; justify-self: start; }
@@ -1342,7 +1343,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     <p><b>4. Pedidos.</b> El pedido queda confirmado cuando recibimos el pago completo. Si una pieza se agota, te avisamos y te devolvemos el dinero o te ofrecemos otra.</p>
     <p><b>5. Pagos.</b> Aceptamos Yape, Plin y tarjeta de crédito o débito. Con Yape o Plin debes enviarnos la captura del pago por WhatsApp. Nunca te pediremos los números de tu tarjeta por chat ni por correo.</p>
     <p><b>6. Comprobante de pago.</b> Emitimos boleta de venta electrónica por cada compra. Si la compra supera S/ 700, necesitamos tu nombre y DNI.</p>
-    <p><b>7. Envíos.</b> Preparamos tu pedido en 7 a 10 días hábiles y despachamos los lunes, jueves y viernes. Llega en 1 a 2 días hábiles a Cusco, 2 a 7 al resto del Perú y hasta 10 a zonas de selva o alejadas. Debes grabar un video sin cortes al abrir tu paquete; sin ese video no podemos atender reclamos por daños del transporte.</p>
+    <p><b>7. Envíos.</b> No hacemos entregas a domicilio: enviamos por Shalom y recoges tu pedido en la agencia de tu ciudad con tu DNI. Preparamos tu pedido en 7 a 10 días hábiles y despachamos los lunes, jueves y viernes. Llega en 1 a 2 días hábiles a Cusco, 2 a 7 al resto del Perú y hasta 10 a zonas de selva o alejadas. Debes grabar un video sin cortes al abrir tu paquete; sin ese video no podemos atender reclamos por daños del transporte.</p>
     <p><b>8. Cambios y devoluciones.</b> Si tu pieza llega dañada y nos envías el video de apertura en un máximo de 48 horas, te la reponemos gratis; si no podemos reponerla, te devolvemos el dinero en un máximo de 7 días hábiles. Aceptamos cambios dentro de los 7 días si la pieza está sin uso y en su empaque; esos envíos corren por tu cuenta.</p>
     <p><b>9. Uso de la página.</b> Las fotos, el logo y los diseños de MYA Manualidades no se pueden copiar ni usar sin nuestro permiso.</p>
     <p><b>10. Libro de Reclamaciones.</b> Está disponible en el botón "Libro de Reclamaciones" al pie de la página. Respondemos en un plazo máximo de 15 días hábiles.</p>
@@ -1450,7 +1451,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <h2 id="sheetName"></h2>
       <strong class="price" id="sheetPrice"></strong>
       <p id="sheetDesc"></p>
-      <p class="ship">Envío por Shalom a todo el Perú · se paga al recoger (gratis desde S/ 220)<br>Preparación: 7 a 10 días hábiles · despachamos lunes, jueves y viernes</p>
+      <p class="ship">Envío por Shalom a todo el Perú: recoges en la agencia (no hacemos entregas a domicilio) y pagas el envío al recoger<br>Preparación: 7 a 10 días hábiles · despachamos lunes, jueves y viernes</p>
       <div class="sheet-actions"><button class="buy-btn" id="buyBtn" type="button">Comprar</button></div>
     </div>
   </div>
@@ -1484,10 +1485,11 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
         <input id="fName" name="name" autocomplete="name" required>
         <label for="fPhone">Celular</label>
         <input id="fPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="9xx xxx xxx">
-        <label for="fAddr">Dirección</label>
-        <input id="fAddr" name="addr" autocomplete="street-address" placeholder="Calle, número, urbanización" required>
-        <label for="fRef">Referencia <span>(opcional)</span></label>
-        <input id="fRef" name="ref" placeholder="Cerca de…">
+        <p class="pickup-note">No hacemos entregas a domicilio: enviamos por Shalom y recoges tu pedido en la agencia, con tu DNI.</p>
+        <label for="fAddr">Agencia Shalom donde recogerás</label>
+        <input id="fAddr" name="addr" placeholder="Ej.: Shalom Av. Collasuyo, Cusco" required>
+        <label for="fRef">DNI de quien recoge</label>
+        <input id="fRef" name="ref" inputmode="numeric" maxlength="12" placeholder="8 dígitos" required>
         <p class="addr-err" id="addrErr" role="alert"></p>
         <button class="buy-btn" type="submit">Continuar</button>
       </form>
@@ -2162,7 +2164,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       `• Envío por Shalom a ${shipPlace()} — ${gratis() ? 'gratis' : 'lo pago en Shalom al recoger'}\n` +
       `Total: S/ ${total()}\n`;
     if (addr) {
-      m += `\nDatos de entrega:\n${addr.name}\n${addr.addr}${addr.ref ? ` (ref.: ${addr.ref})` : ''}\n${[addr.dist, addr.prov, addr.dep].join(', ')}\n`;
+      m += `\nRecojo en Shalom:\n${addr.name}${addr.ref ? ` — DNI ${addr.ref}` : ''}\nAgencia: ${addr.addr}\n${[addr.dist, addr.prov, addr.dep].join(', ')}\n`;
       if (addr.phone) m += `Cel.: ${addr.phone}\n`;
     }
     if (payMethod) {
@@ -2186,13 +2188,12 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     let code = PROV_CODE[chosen] || '';
     if (chosen === 'Lima' && prov && prov.n === 'Lima') code = 'LMA';
     if (code) q.set(`${a}[province]`, code);
-    q.set(`${a}[city]`, (prov && prov.n) || chosen || '');
-    q.set(`${a}[address1]`, (addr && addr.addr) || `Recojo en agencia Shalom de ${(prov && prov.n) || chosen}`);
-    if (dist) q.set(`${a}[address2]`, `Distrito: ${dist}`);
+    q.set(`${a}[city]`, dist || (prov && prov.n) || chosen || '');
+    q.set(`${a}[address1]`, `Recojo en agencia Shalom${addr && addr.addr ? `: ${addr.addr}` : ` de ${(prov && prov.n) || chosen}`}`);
     if (parts[0]) q.set(`${a}[first_name]`, parts[0]);
     if (parts.length > 1) q.set(`${a}[last_name]`, parts.slice(1).join(' '));
     if (addr && addr.phone) q.set(`${a}[phone]`, addr.phone);
-    q.set('note', `Envío por Shalom a ${shipPlace()} (el cliente paga el envío al recoger).${addr && addr.ref ? ` Referencia: ${addr.ref}.` : ''} El cliente aceptó grabar la apertura del paquete.`);
+    q.set('note', `Recojo en agencia Shalom${addr && addr.addr ? ` (${addr.addr})` : ''}, ${shipPlace()}. El cliente paga el envío al recoger. No es entrega a domicilio.${addr && addr.ref ? ` DNI de quien recoge: ${addr.ref}.` : ''} El cliente aceptó grabar la apertura del paquete.`);
     return `/cart/${current.dataset.variant}:1?${q.toString()}`;
   }
   function refresh() {
@@ -2212,7 +2213,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     }
     if (!chosen) summary.textContent = 'Elige dónde lo enviamos para ver el envío y el total.';
     else summary.innerHTML = `<b class="total">Total S/ ${total()}</b> · ${envioTxt()}` +
-      (on ? '' : auth.user ? ' · completa tu dirección' : ' · elige la provincia');
+      (on ? '' : auth.user ? ' · completa tus datos de recojo' : ' · elige la provincia');
   }
 
   // ---------- métodos de pago ----------
@@ -2473,7 +2474,7 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   }
   function showForm() {
     step = 'form';
-    setHead('Datos de entrega', showDists);
+    setHead('Datos de recojo', showDists);
     list.hidden = true; placed.hidden = true; addrForm.hidden = false;
     document.getElementById('addrWhere').textContent = shipPlace();
     const saved = store.get(auth.addrKey()) || {};
@@ -2490,7 +2491,8 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const v = (id) => document.getElementById(id).value.trim();
     const err = document.getElementById('addrErr');
     if (!v('fName')) { err.textContent = 'Escribe el nombre de quien recibe.'; document.getElementById('fName').focus(); return; }
-    if (!v('fAddr')) { err.textContent = 'Escribe la dirección de entrega.'; document.getElementById('fAddr').focus(); return; }
+    if (!v('fAddr')) { err.textContent = 'Escribe la agencia Shalom donde recogerás.'; document.getElementById('fAddr').focus(); return; }
+    if (v('fRef').replace(/\D/g, '').length < 8) { err.textContent = 'Escribe el DNI de quien recoge (8 dígitos).'; document.getElementById('fRef').focus(); return; }
     const phone = v('fPhone');
     if (phone && phone.replace(/\D/g, '').length < 9) { err.textContent = 'El celular debe tener 9 dígitos.'; document.getElementById('fPhone').focus(); return; }
     addr = { name: v('fName'), phone, addr: v('fAddr'), ref: v('fRef'), dep: chosen, prov: prov.n, provId: prov.id, dist };
@@ -2504,14 +2506,14 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     const back = auth.user ? (addr ? showForm : prov ? showDists : showDeps) : (PROV && PROV[chosen] ? showProvs : showDeps);
     setHead('Envío', back);
     if (auth.user && addr) {
-      placed.innerHTML = `<div class="placed-card"><h4>Enviamos a</h4><strong>${addr.name}</strong>
-        <p>${addr.addr}${addr.ref ? `<br>Ref.: ${addr.ref}` : ''}<br>${shipPlace()}${addr.phone ? `<br>Cel.: ${addr.phone}` : ''}</p>
+      placed.innerHTML = `<div class="placed-card"><h4>Recojo en Shalom</h4><strong>${addr.name}</strong>
+        <p>Recoge en: ${addr.addr}${addr.ref ? `<br>DNI: ${addr.ref}` : ''}<br>${shipPlace()}${addr.phone ? `<br>Cel.: ${addr.phone}` : ''}</p>
         <p>Envío por Shalom: ${envioTxt()}. Llega en ${ENTREGA(chosen)} después del despacho.</p>
         ${justSaved ? '<span class="saved-flag">✓ Dirección guardada en tu cuenta</span>' : ''}
         <div class="placed-actions"><button class="ghost-btn" type="button" data-a="edit">Editar datos</button><button class="ghost-btn" type="button" data-a="other">Otra dirección</button></div></div>`;
     } else {
       placed.innerHTML = `<div class="placed-card"><h4>Envío a</h4><strong>${shipPlace()}</strong>
-        <p>Recoges en la agencia Shalom de tu ciudad; ${envioTxt()}. Llega en ${ENTREGA(chosen)} después del despacho.</p>
+        <p>Recoges en la agencia Shalom de tu ciudad (no hacemos entregas a domicilio); ${envioTxt()}. Llega en ${ENTREGA(chosen)} después del despacho.</p>
         <div class="placed-actions"><button class="ghost-btn" type="button" data-a="other">Cambiar</button></div></div>
         <p class="placed-note">¿Quieres guardar tu dirección completa? <button class="ghost-btn" type="button" data-a="login">Iniciar sesión</button></p>`;
     }
