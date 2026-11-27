@@ -1213,7 +1213,7 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 }
 .libro textarea { resize: vertical; }
 .libro input:focus, .libro select:focus, .libro textarea:focus { outline: 2px solid var(--copper); outline-offset: 0; border-color: transparent; }
-.lr-hidden-form { display: none; }
+.lr-hidden-form { position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden; }
 .lr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lr-row > div { display: grid; gap: 6px; min-width: 0; }
 .lr-radios { display: grid; gap: 6px; }

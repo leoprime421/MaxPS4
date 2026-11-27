@@ -65,6 +65,10 @@ def convert(src, view_switch):
     for old, new in view_switch:
         assert old in s, (src, old)
         s = s.replace(old, new)
+    # Scripts de Shopify (incluye el captcha de los formularios); obligatorio en plantillas con layout none
+    k = s.index('<meta name="viewport"')
+    k = s.index('>', k) + 1
+    s = s[:k] + '\n{{ content_for_header }}' + s[k:]
     return '{% layout none %}\n' + s
 
 
