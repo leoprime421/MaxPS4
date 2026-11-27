@@ -1332,6 +1332,15 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   </div>
 </dialog>
 
+<form id="libroShopForm" method="post" action="/contact" accept-charset="UTF-8" hidden>
+  <input type="hidden" name="form_type" value="contact">
+  <input type="hidden" name="utf8" value="✓">
+  <input type="hidden" name="return_to" id="lrReturn" value="/">
+  <input type="hidden" name="contact[name]" id="lrSName">
+  <input type="hidden" name="contact[email]" id="lrSMail">
+  <input type="hidden" name="contact[phone]" id="lrSPhone">
+  <input type="hidden" name="contact[body]" id="lrSBody">
+</form>
 <dialog class="libro" id="libro" aria-labelledby="libroTitle">
   <button class="shop-close" id="libroClose" type="button" aria-label="Cerrar">×</button>
   <div class="libro-in">
@@ -1393,15 +1402,16 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
       <p class="libro-note">Te responderemos en un plazo máximo de 15 días hábiles. Presentar un reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
     </form>
     <div class="libro-done" id="libroDone" hidden>
-      <h3>Tu reclamo está listo para enviar</h3>
-      <p>Se abrió tu correo con la hoja de reclamación, dirigida a <b>myamanualidades2026@gmail.com</b> y con copia para ti. Solo falta tocar <b>Enviar</b>. Guarda este número: <b id="lrNumDone"></b>.</p>
+      <h3 id="lrDoneTitle">Tu reclamo está listo para enviar</h3>
+      <p id="lrDoneMsg">Se abrió tu correo con la hoja de reclamación, dirigida a <b>myamanualidades2026@gmail.com</b> y con copia para ti. Solo falta tocar <b>Enviar</b>.</p>
+      <p>Guarda este número: <b id="lrNumDone"></b>.</p>
       <pre class="msg" id="lrText"></pre>
       <div class="done-actions">
-        <a class="ghost-btn" id="lrMailto" href="#">Abrir mi correo otra vez</a>
+        <a class="ghost-btn" id="lrMailto" href="#">Enviarme una copia a mi correo</a>
         <button class="ghost-btn" id="lrCopy" type="button">Copiar hoja</button>
         <button class="buy-btn" id="lrBack" type="button">Listo</button>
       </div>
-      <p class="libro-note">Si tu correo no se abrió, copia la hoja y envíala a myamanualidades2026@gmail.com.</p>
+      <p class="libro-note">Guarda una copia: tócala en "Copiar hoja" o envíatela a tu correo. Si tienes algún problema, escríbenos a myamanualidades2026@gmail.com.</p>
     </div>
   </div>
 </dialog>
@@ -2727,10 +2737,38 @@ Respuesta del proveedor: en un plazo máximo de 15 días hábiles.`;
     document.getElementById('lrText').textContent = text;
     document.getElementById('lrNumDone').textContent = lrNum;
     document.getElementById('lrMailto').href = href;
+    if (isShopify) {
+      // Shopify envía la hoja desde sus servidores al correo de contacto de la tienda; vuelve aquí con ?contact_posted=true
+      try { sessionStorage.setItem('mya-libro', JSON.stringify({ num: lrNum, text, href })); } catch (_) { /* storage blocked */ }
+      const back = location.pathname + (location.search.includes('view=') ? location.search.replace(/[?&]contact_posted=true/, '') : '');
+      document.getElementById('lrReturn').value = back + (back.includes('?') ? '&' : '?') + 'contact_posted=true';
+      document.getElementById('lrSName').value = v('lrName');
+      document.getElementById('lrSMail').value = v('lrMail');
+      document.getElementById('lrSPhone').value = v('lrPhone');
+      document.getElementById('lrSBody').value = text;
+      document.getElementById('libroShopForm').submit();
+      return;
+    }
     libroForm.hidden = true; libroDone.hidden = false;
     libro.scrollTop = 0;
     location.href = href;
   });
+  // Al volver de Shopify con el reclamo enviado, mostrar la constancia.
+  if (isShopify && /[?&]contact_posted=true/.test(location.search)) {
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem('mya-libro')); sessionStorage.removeItem('mya-libro'); } catch (_) { saved = null; }
+    if (saved) {
+      lrNum = saved.num;
+      document.getElementById('lrNum').textContent = `N.° ${saved.num}`;
+      document.getElementById('lrText').textContent = saved.text;
+      document.getElementById('lrNumDone').textContent = saved.num;
+      document.getElementById('lrMailto').href = saved.href;
+      document.getElementById('lrDoneTitle').textContent = 'Tu reclamo fue enviado';
+      document.getElementById('lrDoneMsg').innerHTML = 'Recibimos tu hoja de reclamación. Te responderemos en un plazo máximo de 15 días hábiles al correo o teléfono que dejaste.';
+      libroForm.hidden = true; libroDone.hidden = false;
+      libro.showModal();
+    }
+  }
   const lrCopy = document.getElementById('lrCopy');
   lrCopy.addEventListener('click', () => {
     const t = document.getElementById('lrText');
