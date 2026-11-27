@@ -1144,7 +1144,6 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 }
 .libro textarea { resize: vertical; }
 .libro input:focus, .libro select:focus, .libro textarea:focus { outline: 2px solid var(--copper); outline-offset: 0; border-color: transparent; }
-.lr-hidden-form { position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden; }
 .lr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lr-row > div { display: grid; gap: 6px; min-width: 0; }
 .lr-radios { display: grid; gap: 6px; }
@@ -1333,15 +1332,6 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   </div>
 </dialog>
 
-<form id="libroShopForm" class="lr-hidden-form" method="post" action="/contact" accept-charset="UTF-8">
-  <input type="hidden" name="form_type" value="contact">
-  <input type="hidden" name="utf8" value="✓">
-  <input type="hidden" name="return_to" id="lrReturn" value="/">
-  <input type="hidden" name="contact[name]" id="lrSName">
-  <input type="hidden" name="contact[email]" id="lrSMail">
-  <input type="hidden" name="contact[phone]" id="lrSPhone">
-  <input type="hidden" name="contact[body]" id="lrSBody">
-</form>
 <dialog class="libro" id="libro" aria-labelledby="libroTitle">
   <button class="shop-close" id="libroClose" type="button" aria-label="Cerrar">×</button>
   <div class="libro-in">
@@ -1354,25 +1344,27 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
     </header>
     <p class="libro-biz">MANRIQUE GUTIERREZ JESABETH MARIANELA (MYA Manualidades) · RUC 10239845075 · Santa Monica A9, Cusco, Perú</p>
     <form id="libroForm" novalidate>
+      <input type="hidden" name="return_to" id="lrReturn" value="/">
+      <textarea name="contact[body]" id="lrBody" hidden></textarea>
       <fieldset>
         <legend>1. Tus datos</legend>
         <label for="lrName">Nombres y apellidos</label>
-        <input id="lrName" autocomplete="name" required>
+        <input id="lrName" name="contact[name]" autocomplete="name" required>
         <div class="lr-row">
           <div><label for="lrDocType">Documento</label>
-            <select id="lrDocType"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
-          <div><label for="lrDoc">Número</label><input id="lrDoc" inputmode="numeric" required></div>
+            <select id="lrDocType" name="contact[Tipo de documento]"><option>DNI</option><option>Carné de extranjería</option><option>Pasaporte</option></select></div>
+          <div><label for="lrDoc">Número</label><input id="lrDoc" name="contact[Numero de documento]" inputmode="numeric" required></div>
         </div>
         <label for="lrAddr">Domicilio</label>
-        <input id="lrAddr" autocomplete="street-address" required>
+        <input id="lrAddr" name="contact[Domicilio]" autocomplete="street-address" required>
         <div class="lr-row">
-          <div><label for="lrPhone">Teléfono</label><input id="lrPhone" type="tel" autocomplete="tel" required></div>
-          <div><label for="lrMail">Correo</label><input id="lrMail" type="email" autocomplete="email" required></div>
+          <div><label for="lrPhone">Teléfono</label><input id="lrPhone" name="contact[phone]" type="tel" autocomplete="tel" required></div>
+          <div><label for="lrMail">Correo</label><input id="lrMail" name="contact[email]" type="email" autocomplete="email" required></div>
         </div>
         <label class="lr-check"><input type="checkbox" id="lrMinor"> Soy menor de edad</label>
         <div id="lrParentBox" hidden>
           <label for="lrParent">Nombre del padre, madre o apoderado</label>
-          <input id="lrParent">
+          <input id="lrParent" name="contact[Apoderado]">
         </div>
       </fieldset>
       <fieldset>
@@ -1382,8 +1374,8 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
           <label><input type="radio" name="lrItem" value="Servicio"> Servicio</label>
         </div>
         <div class="lr-row">
-          <div><label for="lrOrder">Producto o número de pedido</label><input id="lrOrder" required></div>
-          <div><label for="lrAmount">Monto reclamado (S/)</label><input id="lrAmount" inputmode="decimal" placeholder="0.00"></div>
+          <div><label for="lrOrder">Producto o número de pedido</label><input id="lrOrder" name="contact[Producto o pedido]" required></div>
+          <div><label for="lrAmount">Monto reclamado (S/)</label><input id="lrAmount" name="contact[Monto reclamado]" inputmode="decimal" placeholder="0.00"></div>
         </div>
       </fieldset>
       <fieldset>
@@ -1393,9 +1385,9 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
           <label><input type="radio" name="lrType" value="Queja"> <b>Queja</b>: no estás conforme con la atención recibida.</label>
         </div>
         <label for="lrDetail">Detalle</label>
-        <textarea id="lrDetail" rows="4" required></textarea>
+        <textarea id="lrDetail" name="contact[Detalle]" rows="4" required></textarea>
         <label for="lrAsk">¿Qué solicitas?</label>
-        <textarea id="lrAsk" rows="2" required></textarea>
+        <textarea id="lrAsk" name="contact[Pedido del consumidor]" rows="2" required></textarea>
       </fieldset>
       <label class="lr-check"><input type="checkbox" id="lrOk"> Acepto que MYA Manualidades use estos datos para atender mi reclamo.</label>
       <p class="addr-err" id="lrErr" role="alert"></p>
@@ -2695,16 +2687,15 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   libro.addEventListener('click', (e) => { if (e.target === libro) libro.close(); });
   document.getElementById('lrMinor').addEventListener('change', (e) => { document.getElementById('lrParentBox').hidden = !e.target.checked; });
   libroForm.addEventListener('submit', (e) => {
-    e.preventDefault();
     const v = (id) => document.getElementById(id).value.trim();
     const err = document.getElementById('lrErr');
     const need = [['lrName', 'tu nombre'], ['lrDoc', 'tu número de documento'], ['lrAddr', 'tu domicilio'], ['lrPhone', 'tu teléfono'], ['lrMail', 'tu correo'], ['lrOrder', 'el producto o pedido'], ['lrDetail', 'el detalle'], ['lrAsk', 'lo que solicitas']];
     for (const [id, what] of need) {
-      if (!v(id)) { err.textContent = `Falta ${what}.`; document.getElementById(id).focus(); return; }
+      if (!v(id)) { err.textContent = `Falta ${what}.`; document.getElementById(id).focus(); e.preventDefault(); return; }
     }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('lrMail'))) { err.textContent = 'Revisa tu correo, parece incompleto.'; document.getElementById('lrMail').focus(); return; }
-    if (document.getElementById('lrMinor').checked && !v('lrParent')) { err.textContent = 'Falta el nombre del padre, madre o apoderado.'; document.getElementById('lrParent').focus(); return; }
-    if (!document.getElementById('lrOk').checked) { err.textContent = 'Marca la casilla para que podamos usar tus datos y atender tu reclamo.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('lrMail'))) { err.textContent = 'Revisa tu correo, parece incompleto.'; document.getElementById('lrMail').focus(); e.preventDefault(); return; }
+    if (document.getElementById('lrMinor').checked && !v('lrParent')) { err.textContent = 'Falta el nombre del padre, madre o apoderado.'; document.getElementById('lrParent').focus(); e.preventDefault(); return; }
+    if (!document.getElementById('lrOk').checked) { err.textContent = 'Marca la casilla para que podamos usar tus datos y atender tu reclamo.'; e.preventDefault(); return; }
     const type = libroForm.querySelector('[name=lrType]:checked').value;
     const item = libroForm.querySelector('[name=lrItem]:checked').value;
     const text =
@@ -2743,15 +2734,13 @@ Respuesta del proveedor: en un plazo máximo de 15 días hábiles.`;
       try { sessionStorage.setItem('mya-libro', JSON.stringify({ num: lrNum, text, href })); } catch (_) { /* storage blocked */ }
       const back = location.pathname + (location.search.includes('view=') ? location.search.replace(/[?&]contact_posted=true/, '') : '');
       document.getElementById('lrReturn').value = back + (back.includes('?') ? '&' : '?') + 'contact_posted=true';
-      document.getElementById('lrSName').value = v('lrName');
-      document.getElementById('lrSMail').value = v('lrMail');
-      document.getElementById('lrSPhone').value = v('lrPhone');
-      document.getElementById('lrSBody').value = text;
-      const sf = document.getElementById('libroShopForm');
-      // requestSubmit dispara el evento submit, que Shopify usa para agregar el captcha
-      if (sf.requestSubmit) sf.requestSubmit(); else sf.submit();
+      document.getElementById('lrBody').value = text;
+      // No se detiene el envío: el formulario oficial de Shopify sigue (con su captcha) y vuelve aquí.
+      const btn = libroForm.querySelector('button[type=submit]');
+      btn.textContent = 'Enviando…';
       return;
     }
+    e.preventDefault();
     libroForm.hidden = true; libroDone.hidden = false;
     libro.scrollTop = 0;
     location.href = href;

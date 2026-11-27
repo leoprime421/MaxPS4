@@ -55,13 +55,10 @@ def convert(src, view_switch):
             '  window.MYA_FRAMES = {\n__FRAMES__\n  };\n</script>\n').replace('__FRAMES__', frames)
     i = s.index('<title>')
     s = s[:i] + head + s[i:]
-    # Formulario de contacto oficial de Shopify (agrega el captcha): reemplaza el formulario manual del Libro de Reclamaciones
-    i = s.index('<form id="libroShopForm"')
-    j = s.index('</form>', i) + len('</form>')
-    block = s[i:j]
-    inner = block[block.index('>') + 1:block.rindex('</form>')]
-    inner = inner.replace('  <input type="hidden" name="form_type" value="contact">\n', '').replace('  <input type="hidden" name="utf8" value="✓">\n', '')
-    s = s[:i] + "{% form 'contact', id: 'libroShopForm', class: 'lr-hidden-form' %}" + inner + '{% endform %}' + s[j:]
+    # Formulario de contacto oficial de Shopify (agrega el captcha): la hoja del Libro de Reclamaciones es ese formulario
+    i = s.index('<form id="libroForm" novalidate>')
+    j = s.index('</form>', i)
+    s = s[:i] + "{% form 'contact', id: 'libroForm', novalidate: 'novalidate' %}" + s[i + len('<form id="libroForm" novalidate>'):j] + '{% endform %}' + s[j + len('</form>'):]
     for old, new in view_switch:
         assert old in s, (src, old)
         s = s.replace(old, new)
