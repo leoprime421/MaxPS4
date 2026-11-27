@@ -1156,6 +1156,7 @@ dialog.libro::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
 }
 .libro textarea { resize: vertical; }
 .libro input:focus, .libro select:focus, .libro textarea:focus { outline: 2px solid var(--copper); outline-offset: 0; border-color: transparent; }
+.lr-hidden-form { display: none; }
 .lr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .lr-row > div { display: grid; gap: 6px; min-width: 0; }
 .lr-radios { display: grid; gap: 6px; }
@@ -1344,15 +1345,13 @@ dialog.terms::backdrop { background: rgba(40, 22, 14, .72); backdrop-filter: blu
   </div>
 </dialog>
 
-<form id="libroShopForm" method="post" action="/contact" accept-charset="UTF-8" hidden>
-  <input type="hidden" name="form_type" value="contact">
-  <input type="hidden" name="utf8" value="✓">
+{% form 'contact', id: 'libroShopForm', class: 'lr-hidden-form' %}
   <input type="hidden" name="return_to" id="lrReturn" value="/">
   <input type="hidden" name="contact[name]" id="lrSName">
   <input type="hidden" name="contact[email]" id="lrSMail">
   <input type="hidden" name="contact[phone]" id="lrSPhone">
   <input type="hidden" name="contact[body]" id="lrSBody">
-</form>
+{% endform %}
 <dialog class="libro" id="libro" aria-labelledby="libroTitle">
   <button class="shop-close" id="libroClose" type="button" aria-label="Cerrar">×</button>
   <div class="libro-in">
@@ -2758,7 +2757,9 @@ Respuesta del proveedor: en un plazo máximo de 15 días hábiles.`;
       document.getElementById('lrSMail').value = v('lrMail');
       document.getElementById('lrSPhone').value = v('lrPhone');
       document.getElementById('lrSBody').value = text;
-      document.getElementById('libroShopForm').submit();
+      const sf = document.getElementById('libroShopForm');
+      // requestSubmit dispara el evento submit, que Shopify usa para agregar el captcha
+      if (sf.requestSubmit) sf.requestSubmit(); else sf.submit();
       return;
     }
     libroForm.hidden = true; libroDone.hidden = false;
